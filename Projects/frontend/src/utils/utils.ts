@@ -1,5 +1,5 @@
-const serverURL = "http://localhost:8080"
-const hostname = "https://evaluateai.vercel.app";
+const serverURL = "https://api.gradelab.io"
+const hostname = "https://api.gradelab.io";
 const currencySymbol = "₹";
 const appName = "EvaluateAI";
 //UploadThing
