@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { appName, serverURL } from '@/utils/utils';
 import { ToastContainer, toast } from 'react-toastify';
 import Head from 'next/head';
+import { FiCheck, FiX } from 'react-icons/fi';
 
 export default function SignUp() {
     useEffect(() => {
@@ -288,22 +289,20 @@ export default function SignUp() {
                             </button>
                         )}
                     </div>
+                    <ToastContainer 
+                        position="top-right"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="colored"
+                    />
                 </div>
-
-                {/* Toast Notifications */}
-                <ToastContainer 
-                    position="top-right"
-                    autoClose={5000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="colored"
-                />
             </main>
         </>
-    }
+    );
 }
