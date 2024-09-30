@@ -7,76 +7,63 @@ import { appName, serverURL } from '@/utils/utils';
 import { ToastContainer, toast } from 'react-toastify';
 import Head from 'next/head';
 
-export default function Home() {
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [emailError, setEmailError] = useState<string>("");
-
-    const [lockoutTime, setLockoutTime] = useState<number | null>(null);
-    const [remainingTime, setRemainingTime] = useState<number | null>(null);
-
+export default function Login() {
     useEffect(() => {
-        const lockoutEndTime = localStorage.getItem("lockoutEndTime");
-        if (lockoutEndTime) {
-            const lockoutTimestamp = parseInt(lockoutEndTime, 10);
-            const now = new Date().getTime();
-            if (lockoutTimestamp > now) {
-                setLockoutTime(lockoutTimestamp);
-                startCountdown(lockoutTimestamp - now);
-            } else {
-                localStorage.removeItem("lockoutEndTime");
+        if (typeof window !== 'undefined') {
+            if (localStorage.getItem("token")) {
+                window.location.href = "/home";
             }
         }
     }, []);
 
-    useEffect(() => {
-        if (lockoutTime) {
-            const interval = setInterval(() => {
-                const now = new Date().getTime();
-                if (lockoutTime && lockoutTime > now) {
-                    setRemainingTime(lockoutTime - now);
-                } else {
-                    setRemainingTime(null);
-                    setLockoutTime(null);
-                    localStorage.removeItem("lockoutEndTime");
-                    clearInterval(interval);
-                }
-            }, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [lockoutTime]);
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
 
-    const startCountdown = (time: number) => {
-        setRemainingTime(time);
-        const lockoutEndTime = new Date().getTime() + time;
-        localStorage.setItem("lockoutEndTime", lockoutEndTime.toString());
-        setLockoutTime(lockoutEndTime);
-    };
+    const [emailError, setEmailError] = useState<string>("");
+    const [passwordError, setPasswordError] = useState<string>("");
 
-    const formatTime = (milliseconds: number) => {
-        const totalSeconds = Math.floor(milliseconds / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    };
+    const [loading, setLoading] = useState<boolean>(false);
 
+    // Validation Functions
     const validateEmail = (email: string) => {
-        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org)$/;
-        return re.test(String(email).toLowerCase());
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org)$/;
+        return emailRegex.test(email);
     };
 
-    const login = async () => {
+    const validatePassword = (password: string) => {
+        return password.length >= 8; // Basic validation
+    };
+
+    // Handle Login
+    const handleLogin = async () => {
+        setLoading(true);
+
+        // Validate Inputs
+        let valid = true;
+
         if (!validateEmail(email)) {
-            setEmailError("Please enter a valid email address");
+            setEmailError("Please enter a valid email address.");
+            valid = false;
+        } else {
+            setEmailError("");
+        }
+
+        if (!validatePassword(password)) {
+            setPasswordError("Password must be at least 8 characters long.");
+            valid = false;
+        } else {
+            setPasswordError("");
+        }
+
+        if (!valid) {
+            setLoading(false);
             return;
         }
-        setEmailError("");
 
         const config = {
             method: "POST",
             url: `${serverURL}/users/login`,
             headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": `application/json`,
             },
             data: {
@@ -87,62 +74,102 @@ export default function Home() {
 
         try {
             const response = await axios(config);
-            toast.success("Logged In!");
-            localStorage.setItem("token", response.data.token);
-            window.location.href = response.data.user.type === 0 ? "/admin" : "/home";
-        } catch (error) {
-            if (error.response && error.response.status === 429) {
-                toast.error("Too many login attempts. Please try again after 15 minutes.");
-                startCountdown(15 * 60 * 1000); // 15 minutes in milliseconds
+            localStorage.setItem("token", response.data.token); // Save the token
+            toast.success("Login successful!");
+            setTimeout(() => {
+                window.location.href = "/home"; // Redirect to home
+            }, 1500);
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                toast.error(error.response.data);
             } else {
-                toast.error(error.response?.data || "Something went wrong!");
+                toast.error("Something went wrong! Please try again later.");
             }
+        } finally {
+            setLoading(false);
         }
-    };
+    }
 
     return (
         <>
             <Head>
                 <title>{`Login - ${appName}`}</title>
-                <meta name="description" content={`Log in to ${appName} - AI-Powered Exam Sheet Evaluator. Seamless access to effortless evaluation.`} />
+                <meta name="description" content={`Login to ${appName} - AI-Powered Exam Sheet Evaluator.`} />
             </Head>
-            <main className="flex items-center justify-center w-screen h-screen bg-gray-100">
-                <div className="flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-                    <div className="flex items-center mb-6">
-                        <img
-                            src="https://gradelab.io/wp-content/uploads/2024/09/gradelab-logo-black.png"
-                            alt="GradeLab Logo"
-                            className="h-12"
-                        />
+            <main className="min-h-screen flex flex-col md:flex-row bg-gray-100">
+                {/* Sidebar */}
+                <div className="hidden md:flex md:w-1/2 lg:w-2/3 bg-gradient-to-br from-indigo-600 to-purple-600 items-center justify-center p-10">
+                    <div className="text-white max-w-md">
+                        <Link href="/">
+                            <h1 className="text-5xl font-bold mb-4 flex items-center">
+                                🤖 {appName} 📝
+                            </h1>
+                        </Link>
+                        <p className="text-xl">
+                            Seamless Access, Effortless Evaluation: Welcome to {appName}, Where Innovation Meets Intelligent Grading.
+                        </p>
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">Welcome Back!</h1>
-                    {remainingTime ? (
-                        <p className="text-red-500 text-lg text-center">Too many attempts. Please try again in {formatTime(remainingTime)}.</p>
-                    ) : (
-                        <>
-                            <p className="text-center mb-4">Don't have an account? <Link href={'/signup'} className="text-blue-600 hover:underline">Sign up</Link></p>
-                            <label className="text-sm mb-1 text-gray-600">Email</label>
-                            <input 
-                                className={`input input-bordered mb-1 w-full ${emailError ? 'input-error' : ''}`} 
-                                placeholder="Email" 
-                                type="text" 
-                                onChange={(e) => setEmail(e.target.value)} 
-                                value={email} 
-                            />
-                            {emailError && <p className="text-red-500 text-xs mb-2">{emailError}</p>}
-                            <label className="text-sm mb-1 text-gray-600">Password</label>
-                            <input 
-                                className="input input-bordered mb-5 w-full" 
-                                placeholder="Password" 
-                                type="password" 
-                                onChange={(e) => setPassword(e.target.value)} 
-                                value={password} 
-                            />
-                            <button className="btn btn-primary w-full bg-gray-800 hover:bg-gray-900 transition duration-200 text-white" onClick={login}>Login</button>
-                        </>
-                    )}
                 </div>
-                <ToastContainer />
+
+                {/* Login Form */}
+                <div className="flex flex-col w-full md:w-1/2 lg:w-1/3 bg-white p-8 md:p-12 lg:p-16">
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Login</h2>
+                        <p className="text-gray-600">Don't have an account? <Link href="/signup"><span className="text-indigo-600 hover:underline">Sign Up</span></Link></p>
+                    </div>
+
+                    {/* Email */}
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-gray-700 mb-1">Email</label>
+                        <input 
+                            id="email"
+                            type="email"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 ${emailError ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+                        <p className="text-gray-500 text-sm mt-1">Please enter a valid email address (e.g., user@example.com)</p>
+                    </div>
+
+                    {/* Password */}
+                    <div className="mb-4">
+                        <label htmlFor="password" className="block text-gray-700 mb-1">Password</label>
+                        <input 
+                            id="password"
+                            type="password"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 ${passwordError ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="mt-6">
+                        <button 
+                            onClick={handleLogin} 
+                            disabled={loading} 
+                            className={`w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+                        >
+                            {loading ? 'Logging in...' : 'Login'}
+                        </button>
+                    </div>
+                    <ToastContainer 
+                        position="top-right"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="colored"
+                    />
+                </div>
             </main>
         </>
     );
