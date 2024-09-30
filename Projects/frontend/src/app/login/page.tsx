@@ -109,15 +109,9 @@ export default function Home() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Log in to ${appName} - AI-Powered Exam Sheet Evaluator. Seamless access to effortless evaluation.`} />
             </Head>
-            <main className="flex items-center justify-center w-screen h-screen p-4 bg-gradient-to-r from-blue-400 to-indigo-600">
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <img
-                        src="https://gradelab.io/wp-content/uploads/2024/09/gradelab-logo-black.png"
-                        alt="GradeLab Logo"
-                        className="h-32 opacity-20"
-                    />
-                </div>
-                <div className='flex flex-col text-white p-10 max-w-md bg-gradient-to-b from-indigo-600 to-purple-500 rounded-lg shadow-lg z-10'>
+            <main className="flex items-center justify-center w-screen h-screen bg-base-100 p-4">
+                <div className='flex flex-col text-white p-10 max-w-md bg-gradient-to-b to-purple-400 via-violet-500 from-indigo-600 rounded-lg shadow-lg'>
+                    <Link href={"/"}><p className="mb-8 text-center text-3xl">🤖 {appName} 📝</p></Link>
                     <h1 className="text-2xl font-semibold mb-3 text-center">Login to {appName}</h1>
                     {remainingTime ? (
                         <p className="text-red-500 text-lg text-center">Too many attempts. Please try again in {formatTime(remainingTime)}.</p>
