@@ -106,31 +106,24 @@ export default function Home() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Log in to ${appName} - AI-Powered Exam Sheet Evaluator. Seamless access to effortless evaluation.`} />
             </Head>
-            <main className="flex items-center justify-center w-screen h-screen p-4 bg-gradient-to-r from-purple-600 to-blue-500">
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <img
-                        src="https://gradelab.io/wp-content/uploads/2024/09/gradelab-logo-black.png"
-                        alt="GradeLab Logo"
-                        className="h-32 opacity-10"
-                    />
-                </div>
-                <div className="bg-white bg-opacity-80 backdrop-blur-md p-10 rounded-lg shadow-lg z-10 w-full max-w-sm">
-                    <div className="flex justify-center mb-6">
+            <main className="flex items-center justify-center w-screen h-screen bg-gray-100">
+                <div className="flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+                    <div className="flex items-center mb-6">
                         <img
                             src="https://gradelab.io/wp-content/uploads/2024/09/gradelab-logo-black.png"
                             alt="GradeLab Logo"
-                            className="h-20"
+                            className="h-12"
                         />
                     </div>
-                    <h1 className="text-2xl font-semibold text-center text-gray-700 mb-3">Welcome Back!</h1>
+                    <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">Welcome Back!</h1>
                     {remainingTime ? (
                         <p className="text-red-500 text-lg text-center">Too many attempts. Please try again in {formatTime(remainingTime)}.</p>
                     ) : (
                         <>
-                            <p className="text-center mb-4">Don't have an account? <Link href={'/signup'} className="text-blue-500 hover:underline">Sign up</Link></p>
+                            <p className="text-center mb-4">Don't have an account? <Link href={'/signup'} className="text-blue-600 hover:underline">Sign up</Link></p>
                             <label className="text-sm mb-1 text-gray-600">Email</label>
                             <input 
-                                className={`input input-bordered mb-1 max-w-xs ${emailError ? 'input-error' : ''}`} 
+                                className={`input input-bordered mb-1 w-full ${emailError ? 'input-error' : ''}`} 
                                 placeholder="Email" 
                                 type="text" 
                                 onChange={(e) => setEmail(e.target.value)} 
@@ -139,13 +132,13 @@ export default function Home() {
                             {emailError && <p className="text-red-500 text-xs mb-2">{emailError}</p>}
                             <label className="text-sm mb-1 text-gray-600">Password</label>
                             <input 
-                                className="input input-bordered mb-5 max-w-xs" 
+                                className="input input-bordered mb-5 w-full" 
                                 placeholder="Password" 
                                 type="password" 
                                 onChange={(e) => setPassword(e.target.value)} 
                                 value={password} 
                             />
-                            <button className="btn btn-primary w-full bg-purple-600 hover:bg-purple-700 transition duration-200" onClick={login}>Login</button>
+                            <button className="btn btn-primary w-full bg-gray-800 hover:bg-gray-900 transition duration-200 text-white" onClick={login}>Login</button>
                         </>
                     )}
                 </div>
