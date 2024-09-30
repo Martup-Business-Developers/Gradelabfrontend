@@ -109,22 +109,22 @@ export default function Home() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Log in to ${appName} - AI-Powered Exam Sheet Evaluator. Seamless access to effortless evaluation.`} />
             </Head>
-            <main className="w-screen h-screen bg-base-100 flex p-2 overflow-hidden">
-                <div className='flex flex-col text-white p-10 max-w-[30vw] bg-gradient-to-b to-purple-400 via-violet-500 from-indigo-600 h-full rounded-md'>
-                    <Link href={"/"}><p className="mb-10">🤖 {appName} 📝</p></Link>
-                    <p className="text-2xl font-semibold mb-2">
-                        {appName} - AI Powered Exam Sheet Evaluator
-                    </p>
-                    <p className="opacity-70">Seamless Access, Effortless Evaluation: Welcome to {appName}, Where Innovation Meets Intelligent Grading.</p>
+            <main className="flex items-center justify-center w-screen h-screen p-4 bg-gradient-to-r from-blue-400 to-indigo-600">
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <img
+                        src="https://gradelab.io/wp-content/uploads/2024/09/gradelab-logo-black.png"
+                        alt="GradeLab Logo"
+                        className="h-32 opacity-20"
+                    />
                 </div>
-                <div className="animate-fade-in-bottom flex flex-col w-full h-full ml-2 rounded-md p-10">
-                    <p className="font-bold text-xl mb-3">Login</p>
+                <div className='flex flex-col text-white p-10 max-w-md bg-gradient-to-b from-indigo-600 to-purple-500 rounded-lg shadow-lg z-10'>
+                    <h1 className="text-2xl font-semibold mb-3 text-center">Login to {appName}</h1>
                     {remainingTime ? (
-                        <p className="text-red-500 text-lg">Too many attempts. Please try again in {formatTime(remainingTime)}.</p>
+                        <p className="text-red-500 text-lg text-center">Too many attempts. Please try again in {formatTime(remainingTime)}.</p>
                     ) : (
                         <>
-                            <p className="mb-5">Don&apos;t have an account? <Link href={'/signup'}><label htmlFor="createchatbot_modal" className="btn btn-sm">Sign up</label></Link></p>
-                            <p className="text-sm mb-1">Email</p>
+                            <p className="mb-3 text-center">Don&apos;t have an account? <Link href={'/signup'} className="font-bold underline">Sign up</Link></p>
+                            <label className="text-sm mb-1">Email</label>
                             <input 
                                 className={`input input-bordered mb-1 max-w-xs ${emailError ? 'input-error' : ''}`} 
                                 placeholder="Email" 
@@ -133,16 +133,15 @@ export default function Home() {
                                 value={email} 
                             />
                             {emailError && <p className="text-red-500 text-xs mb-2">{emailError}</p>}
-                            <p className="text-xs mb-5 opacity-70">Please enter a valid email address (e.g., user@example.com)</p>
-                            <p className="text-sm mb-1">Password</p>
+                            <label className="text-sm mb-1">Password</label>
                             <input 
-                                className="input input-bordered mb-1 max-w-xs" 
+                                className="input input-bordered mb-5 max-w-xs" 
                                 placeholder="Password" 
                                 type="password" 
                                 onChange={(e) => setPassword(e.target.value)} 
                                 value={password} 
                             />
-                            <button className="btn btn-primary max-w-xs mt-5" onClick={login}>Login</button>
+                            <button className="btn btn-primary w-full" onClick={login}>Login</button>
                         </>
                     )}
                 </div>
