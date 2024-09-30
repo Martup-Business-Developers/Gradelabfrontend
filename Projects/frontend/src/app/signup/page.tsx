@@ -187,101 +187,123 @@ export default function SignUp() {
                 <title>{`Sign Up - ${appName}`}</title>
                 <meta name="description" content={`Create an account on ${appName} - AI-Powered Exam Sheet Evaluator. Enjoy seamless access to effortless evaluation.`} />
             </Head>
-            <main className="w-screen h-screen bg-base-100 flex p-2 overflow-hidden">
+            <main className="min-h-screen flex flex-col md:flex-row bg-gray-100">
                 {/* Sidebar */}
-                <div className='flex flex-col text-white p-10 max-w-[30vw] bg-gradient-to-b to-purple-400 via-violet-500 from-indigo-600 h-full rounded-md'>
-                    <Link href={"/"}><p className="mb-10 text-3xl">🤖 {appName} 📝</p></Link>
-                    <p className="text-2xl font-semibold mb-2">
-                        {appName} - AI Powered Exam Sheet Evaluator
-                    </p>
-                    <p className="opacity-80">Seamless Access, Effortless Evaluation: Welcome to {appName}, Where Innovation Meets Intelligent Grading.</p>
+                <div className="hidden md:flex md:w-1/2 lg:w-2/3 bg-gradient-to-br from-indigo-600 to-purple-600 items-center justify-center p-10">
+                    <div className="text-white max-w-md">
+                        <Link href="/">
+                            <h1 className="text-5xl font-bold mb-4 flex items-center">
+                                🤖 {appName} 📝
+                            </h1>
+                        </Link>
+                        <p className="text-xl">
+                            Seamless Access, Effortless Evaluation: Welcome to {appName}, Where Innovation Meets Intelligent Grading.
+                        </p>
+                    </div>
                 </div>
 
                 {/* Sign Up Form */}
-                <div className="animate-fade-in-bottom flex flex-col w-full h-full ml-2 rounded-md p-10 overflow-y-auto">
-                    <p className="font-bold text-2xl mb-3">Sign Up</p>
-                    <p className="mb-5">Already have an account? <Link href={'/login'}><span className="btn btn-sm btn-outline">Login</span></Link></p>
-                    
+                <div className="flex flex-col w-full md:w-1/2 lg:w-1/3 bg-white p-8 md:p-12 lg:p-16">
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Sign Up</h2>
+                        <p className="text-gray-600">Already have an account? <Link href="/login"><span className="text-indigo-600 hover:underline">Login</span></Link></p>
+                    </div>
+
                     {/* Full Name */}
-                    <div className="flex flex-col mb-4">
-                        <label className="text-sm mb-1">Full Name</label>
+                    <div className="mb-4">
+                        <label htmlFor="name" className="block text-gray-700 mb-1">Full Name</label>
                         <input 
-                            className={`input input-bordered ${nameError ? 'input-error' : ''}`} 
-                            placeholder="Full Name" 
-                            type="text" 
-                            onChange={(e) => setName(e.target.value)} 
-                            value={name} 
+                            id="name"
+                            type="text"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 ${nameError ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="Full Name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                         />
-                        {nameError && <p className="text-red-500 text-xs mt-1">{nameError}</p>}
+                        {nameError && <p className="text-red-500 text-sm mt-1">{nameError}</p>}
                     </div>
 
                     {/* Email */}
-                    <div className="flex flex-col mb-4">
-                        <label className="text-sm mb-1">Email</label>
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-gray-700 mb-1">Email</label>
                         <input 
-                            className={`input input-bordered ${emailError ? 'input-error' : ''}`} 
-                            placeholder="Email" 
-                            type="email" 
-                            onChange={(e) => setEmail(e.target.value)} 
-                            value={email} 
+                            id="email"
+                            type="email"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 ${emailError ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
-                        {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
-                        <p className="text-xs text-gray-500 mt-1">Please enter a valid email address (e.g., user@example.com)</p>
+                        {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+                        <p className="text-gray-500 text-sm mt-1">Please enter a valid email address (e.g., user@example.com)</p>
                     </div>
 
                     {/* Password */}
-                    <div className="flex flex-col mb-4">
-                        <label className="text-sm mb-1">Password</label>
+                    <div className="mb-4">
+                        <label htmlFor="password" className="block text-gray-700 mb-1">Password</label>
                         <input 
-                            className={`input input-bordered ${passwordError ? 'input-error' : ''}`} 
-                            placeholder="Password" 
-                            type="password" 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            value={password} 
+                            id="password"
+                            type="password"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 ${passwordError ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
-                        {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
-                        <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long and include uppercase, lowercase letters, numbers, and special characters.</p>
+                        {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
+                        <p className="text-gray-500 text-sm mt-1">Password must be at least 8 characters long and include uppercase, lowercase letters, numbers, and special characters.</p>
                     </div>
 
                     {/* Verification Code */}
                     {verificationCodeSent && (
-                        <div className="flex flex-col mb-4">
-                            <label className="text-sm mb-1">Verification Code</label>
+                        <div className="mb-4">
+                            <label htmlFor="verificationCode" className="block text-gray-700 mb-1">Verification Code</label>
                             <input 
-                                className="input input-bordered" 
-                                placeholder="Verification Code" 
-                                type="text" 
-                                onChange={(e) => setVerificationCode(e.target.value)} 
-                                value={verificationCode} 
+                                id="verificationCode"
+                                type="text"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                                placeholder="Verification Code"
+                                value={verificationCode}
+                                onChange={(e) => setVerificationCode(e.target.value)}
                             />
                         </div>
                     )}
 
                     {/* Buttons */}
-                    <div className="flex space-x-2">
-                        {!verificationCodeSent && (
+                    <div className="mt-6">
+                        {!verificationCodeSent ? (
                             <button 
                                 onClick={sendVerificationCode} 
                                 disabled={loading} 
-                                className={`btn btn-primary ${loading ? "loading" : ""}`}
+                                className={`w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
                             >
-                                Send Verification Code
+                                {loading ? 'Sending...' : 'Send Verification Code'}
                             </button>
-                        )}
-
-                        {verificationCodeSent && (
+                        ) : (
                             <button 
                                 onClick={verifyEmail} 
                                 disabled={loading} 
-                                className={`btn btn-primary ${loading ? "loading" : ""}`}
+                                className={`w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
                             >
-                                Verify Email & Sign Up
+                                {loading ? 'Verifying...' : 'Verify Email & Sign Up'}
                             </button>
                         )}
                     </div>
-                    <ToastContainer />
                 </div>
+
+                {/* Toast Notifications */}
+                <ToastContainer 
+                    position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="colored"
+                />
             </main>
         </>
-    );
+    }
 }
