@@ -12,11 +12,9 @@ export default function Home() {
     const [password, setPassword] = useState<string>("");
     const [emailError, setEmailError] = useState<string>("");
 
-    // Timer state (for lockout logic if needed)
     const [lockoutTime, setLockoutTime] = useState<number | null>(null);
     const [remainingTime, setRemainingTime] = useState<number | null>(null);
 
-    // Timer logic
     useEffect(() => {
         const lockoutEndTime = localStorage.getItem("lockoutEndTime");
         if (lockoutEndTime) {
@@ -94,7 +92,6 @@ export default function Home() {
             window.location.href = response.data.user.type === 0 ? "/admin" : "/home";
         } catch (error) {
             if (error.response && error.response.status === 429) {
-                // Start the 15-minute lockout countdown
                 toast.error("Too many login attempts. Please try again after 15 minutes.");
                 startCountdown(15 * 60 * 1000); // 15 minutes in milliseconds
             } else {
@@ -109,16 +106,29 @@ export default function Home() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Log in to ${appName} - AI-Powered Exam Sheet Evaluator. Seamless access to effortless evaluation.`} />
             </Head>
-            <main className="flex items-center justify-center w-screen h-screen bg-base-100 p-4">
-                <div className='flex flex-col text-white p-10 max-w-md bg-gradient-to-b to-purple-400 via-violet-500 from-indigo-600 rounded-lg shadow-lg'>
-                    <Link href={"/"}><p className="mb-8 text-center text-3xl">🤖 {appName} 📝</p></Link>
-                    <h1 className="text-2xl font-semibold mb-3 text-center">Login to {appName}</h1>
+            <main className="flex items-center justify-center w-screen h-screen p-4 bg-gradient-to-r from-purple-600 to-blue-500">
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <img
+                        src="https://gradelab.io/wp-content/uploads/2024/09/gradelab-logo-black.png"
+                        alt="GradeLab Logo"
+                        className="h-32 opacity-10"
+                    />
+                </div>
+                <div className="bg-white bg-opacity-80 backdrop-blur-md p-10 rounded-lg shadow-lg z-10 w-full max-w-sm">
+                    <div className="flex justify-center mb-6">
+                        <img
+                            src="https://gradelab.io/wp-content/uploads/2024/09/gradelab-logo-black.png"
+                            alt="GradeLab Logo"
+                            className="h-20"
+                        />
+                    </div>
+                    <h1 className="text-2xl font-semibold text-center text-gray-700 mb-3">Welcome Back!</h1>
                     {remainingTime ? (
                         <p className="text-red-500 text-lg text-center">Too many attempts. Please try again in {formatTime(remainingTime)}.</p>
                     ) : (
                         <>
-                            <p className="mb-3 text-center">Don&apos;t have an account? <Link href={'/signup'} className="font-bold underline">Sign up</Link></p>
-                            <label className="text-sm mb-1">Email</label>
+                            <p className="text-center mb-4">Don't have an account? <Link href={'/signup'} className="text-blue-500 hover:underline">Sign up</Link></p>
+                            <label className="text-sm mb-1 text-gray-600">Email</label>
                             <input 
                                 className={`input input-bordered mb-1 max-w-xs ${emailError ? 'input-error' : ''}`} 
                                 placeholder="Email" 
@@ -127,7 +137,7 @@ export default function Home() {
                                 value={email} 
                             />
                             {emailError && <p className="text-red-500 text-xs mb-2">{emailError}</p>}
-                            <label className="text-sm mb-1">Password</label>
+                            <label className="text-sm mb-1 text-gray-600">Password</label>
                             <input 
                                 className="input input-bordered mb-5 max-w-xs" 
                                 placeholder="Password" 
@@ -135,7 +145,7 @@ export default function Home() {
                                 onChange={(e) => setPassword(e.target.value)} 
                                 value={password} 
                             />
-                            <button className="btn btn-primary w-full" onClick={login}>Login</button>
+                            <button className="btn btn-primary w-full bg-purple-600 hover:bg-purple-700 transition duration-200" onClick={login}>Login</button>
                         </>
                     )}
                 </div>
