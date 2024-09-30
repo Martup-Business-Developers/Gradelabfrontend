@@ -19,11 +19,15 @@ router.get("/", validate, (req, res) => {
     res.send("Users");
 });
 
+const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+
 router.post("/signup", async (req, res) => {
     const schema = joi.object({
         name: joi.string().min(3).required(),
-        email: joi.string().min(6).required().email(),
-        password: joi.string().min(6).required(),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'org'] } }).required(),
+        password: joi.string().pattern(passwordRegex).required().messages({
+            'string.pattern.base': 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character'
+        }),
     });
 
     try {
@@ -55,14 +59,14 @@ router.post("/signup", async (req, res) => {
 
         return res.send(savedUser);
     } catch (err) {
-        return res.status(500).send(err);
+        return res.status(400).send(err.details[0].message);
     }
 });
 
 router.post("/login", async (req, res) => {
     const schema = joi.object({
-        email: joi.string().min(6).required().email(),
-        password: joi.string().min(6),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'org'] } }).required(),
+        password: joi.string().required(),
     });
 
     try {
@@ -70,18 +74,18 @@ router.post("/login", async (req, res) => {
 
         const user = await User.findOne({ email: data.email });
 
-        if (!user) return res.status(400).send("Email or password is wrong");
+        if (!user) return res.status(400).send("Invalid email or password");
 
         const validPassword = await bcrypt.compare(data.password, user.password);
 
         if (!validPassword)
-            return res.status(400).send("Email or password is wrong");
+            return res.status(400).send("Invalid email or password");
 
         const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
 
         return res.send({ user: user, token: token });
     } catch (err) {
-        return res.status(500).send(err);
+        return res.status(400).send(err.details[0].message);
     }
 });
 
@@ -124,7 +128,6 @@ async function sendEmail(email, res) {
             return res.status(500).send(err);
         }
 
-
         const emailVerification = await EmailVerification.findOne({
             email: email,
         });
@@ -149,7 +152,7 @@ async function sendEmail(email, res) {
 
 router.post("/send-verification-code", async (req, res) => {
     const schema = joi.object({
-        email: joi.string().email().required(),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'org'] } }).required(),
     });
 
     try {
@@ -161,16 +164,16 @@ router.post("/send-verification-code", async (req, res) => {
         if (emailVerification && emailVerification.isVerified)
             return res.status(400).send("Email already verified");
 
-        await sendEmail(data.email, res, false);
+        await sendEmail(data.email, res);
     } catch (err) {
-        return res.status(500).send(err);
+        return res.status(400).send(err.details[0].message);
     }
 });
 
 router.post("/verify-email", async (req, res) => {
     const schema = joi.object({
-        email: joi.string().email().required(),
-        code: joi.string().required(),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'org'] } }).required(),
+        code: joi.string().length(4).required(),
     });
 
     try {
@@ -191,7 +194,7 @@ router.post("/verify-email", async (req, res) => {
             return res.status(400).send("Invalid code");
         }
     } catch (err) {
-        return res.status(500).send(err);
+        return res.status(400).send(err.details[0].message);
     }
 });
 
