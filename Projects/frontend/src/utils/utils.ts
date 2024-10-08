@@ -1,6 +1,6 @@
 const serverURL = "https://api.gradelab.io"
 const hostname = "https://api.gradelab.io";
-const currencySymbol = "₹";
+const currencySymbol = "$";
 const appName = "GradeLab";
 //UploadThing
 const maxFileCount = 10;
