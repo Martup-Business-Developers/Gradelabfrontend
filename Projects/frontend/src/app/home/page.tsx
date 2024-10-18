@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { FiUser } from "react-icons/fi"; // Importing an icon for the user
 import { MainContext } from "@/context/context"; // Importing your context
 
 const FeatureCard = ({ icon, title, description }) => (
@@ -22,10 +21,6 @@ const FeatureCard = ({ icon, title, description }) => (
 
 export default function Home() {
   const {
-    moreMenuOpen,
-    setMoreMenuOpen,
-    showMenu,
-    setShowMenu,
     user, // Accessing user from context
   } = useContext(MainContext); // Ensure you're accessing MainContext
 
@@ -88,21 +83,12 @@ export default function Home() {
         />
       </div>
 
-      {/* User Info Section */}
-      <div className="flex items-center mb-4">
-        <div className="avatar placeholder mr-2">
-          <div className="bg-blue-700 text-white mask mask-squircle w-10">
-            <span><FiUser /></span>
-          </div>
-        </div>
-        <p className='font-semibold'>{user?.name || "Guest"}</p> {/* Displaying username or fallback */}
-      </div>
-
+      {/* Welcome Section */}
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center"
+        className="text-center mb-4"
       >
         <p className='text-2xl font-semibold mb-4 text-black'>{welcomeText}</p> {/* Welcome text color is black */}
         <p className='text-xl mb-8 h-12'>{typedText}</p>
