@@ -1,4 +1,5 @@
 "use client";
+
 import axios from 'axios';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -6,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { appName, serverURL } from '@/utils/utils';
 import { ToastContainer, toast } from 'react-toastify';
 import Head from 'next/head';
-import { FiCheck, FiX } from 'react-icons/fi';
+import Image from 'next/image'; // Importing Image for logo
 
 export default function SignUp() {
     useEffect(() => {
@@ -25,9 +26,6 @@ export default function SignUp() {
     const [passwordError, setPasswordError] = useState<string>("");
     const [nameError, setNameError] = useState<string>("");
 
-    const [verificationCodeSent, setVerificationCodeSent] = useState<boolean>(false);
-    const [verificationCode, setVerificationCode] = useState<string>("");
-
     const [loading, setLoading] = useState<boolean>(false);
 
     // Validation Functions
@@ -41,17 +39,13 @@ export default function SignUp() {
     };
 
     const validatePassword = (password: string) => {
-        const hasUpperCase = /[A-Z]/.test(password);
-        const hasLowerCase = /[a-z]/.test(password);
-        const hasNumbers = /\d/.test(password);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-        return password.length >= 8 && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+        return password.length >= 8; // Basic validation
     };
 
-    // Handle Sending Verification Code
-    const sendVerificationCode = async () => {
+    // Handle Sign Up
+    const handleSignUp = async () => {
         setLoading(true);
-        
+
         // Validate Inputs
         let valid = true;
 
@@ -70,7 +64,7 @@ export default function SignUp() {
         }
 
         if (!validatePassword(password)) {
-            setPasswordError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+            setPasswordError("Password must be at least 8 characters long.");
             valid = false;
         } else {
             setPasswordError("");
@@ -83,79 +77,8 @@ export default function SignUp() {
 
         const config = {
             method: "POST",
-            url: `${serverURL}/users/send-verification-code`,
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                "Content-Type": `application/json`,
-            },
-            data: {
-                "email": email
-            }
-        };
-
-        try {
-            const response = await axios(config);
-            toast.success("Verification Code Sent!");
-            setVerificationCodeSent(true);
-        } catch (error: any) {
-            if (error.response && error.response.data) {
-                toast.error(error.response.data);
-            } else {
-                toast.error("Something went wrong! Please try again later.");
-            }
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Handle Email Verification
-    const verifyEmail = async () => {
-        setLoading(true);
-
-        // Validate Verification Code
-        if (verificationCode.trim() === "") {
-            toast.error("Please enter the verification code!");
-            setLoading(false);
-            return;
-        }
-
-        const config = {
-            method: "POST",
-            url: `${serverURL}/users/verify-email`,
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                "Content-Type": `application/json`,
-            },
-            data: {
-                "email": email,
-                "code": verificationCode,
-            }
-        };
-
-        try {
-            const response = await axios(config);
-            toast.success("Email verified!");
-            signup();
-        } catch (error: any) {
-            if (error.response && error.response.data) {
-                toast.error(error.response.data);
-            } else {
-                toast.error("Something went wrong! Please try again later.");
-            }
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Handle Sign Up
-    const signup = async () => {
-        setLoading(true);
-
-        const config = {
-            method: "POST",
             url: `${serverURL}/users/signup`,
             headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": `application/json`,
             },
             data: {
@@ -169,13 +92,13 @@ export default function SignUp() {
             const response = await axios(config);
             toast.success("Account created!");
             setTimeout(() => {
-                window.location.href = "/login";
+                window.location.href = "/login"; // Redirect to login
             }, 1500);
         } catch (error: any) {
             if (error.response && error.response.data) {
                 toast.error(error.response.data);
             } else {
-                toast.error("Something went wrong!");
+                toast.error("Something went wrong! Please try again later.");
             }
         } finally {
             setLoading(false);
@@ -188,13 +111,18 @@ export default function SignUp() {
                 <title>{`Sign Up - ${appName}`}</title>
                 <meta name="description" content={`Create an account on ${appName} - AI-Powered Exam Sheet Evaluator. Enjoy seamless access to effortless evaluation.`} />
             </Head>
-            <main className="min-h-screen flex flex-col md:flex-row bg-gray-100">
+            <main className="min-h-screen flex flex-col md:flex-row bg-black"> {/* Changed background to black */}
                 {/* Sidebar */}
                 <div className="hidden md:flex md:w-1/2 lg:w-2/3 bg-gradient-to-br from-indigo-600 to-purple-600 items-center justify-center p-10">
                     <div className="text-white max-w-md">
                         <Link href="/">
                             <h1 className="text-5xl font-bold mb-4 flex items-center">
-                                🤖 {appName} 📝
+                                <Image 
+                                    src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-white.png" // Updated logo
+                                    alt="GradeLab logo" 
+                                    width={200} 
+                                    height={200} 
+                                /> 
                             </h1>
                         </Link>
                         <p className="text-xl">
@@ -251,43 +179,17 @@ export default function SignUp() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                         {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
-                        <p className="text-gray-500 text-sm mt-1">Password must be at least 8 characters long and include uppercase, lowercase letters, numbers, and special characters.</p>
                     </div>
-
-                    {/* Verification Code */}
-                    {verificationCodeSent && (
-                        <div className="mb-4">
-                            <label htmlFor="verificationCode" className="block text-gray-700 mb-1">Verification Code</label>
-                            <input 
-                                id="verificationCode"
-                                type="text"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                placeholder="Verification Code"
-                                value={verificationCode}
-                                onChange={(e) => setVerificationCode(e.target.value)}
-                            />
-                        </div>
-                    )}
 
                     {/* Buttons */}
                     <div className="mt-6">
-                        {!verificationCodeSent ? (
-                            <button 
-                                onClick={sendVerificationCode} 
-                                disabled={loading} 
-                                className={`w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
-                            >
-                                {loading ? 'Sending...' : 'Send Verification Code'}
-                            </button>
-                        ) : (
-                            <button 
-                                onClick={verifyEmail} 
-                                disabled={loading} 
-                                className={`w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
-                            >
-                                {loading ? 'Verifying...' : 'Verify Email & Sign Up'}
-                            </button>
-                        )}
+                        <button 
+                            onClick={handleSignUp} 
+                            disabled={loading} 
+                            className={`w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+                        >
+                            {loading ? 'Creating account...' : 'Sign Up'}
+                        </button>
                     </div>
                     <ToastContainer 
                         position="top-right"
