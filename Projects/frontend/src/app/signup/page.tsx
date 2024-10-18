@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { appName, serverURL } from '@/utils/utils';
 import { ToastContainer, toast } from 'react-toastify';
 import Head from 'next/head';
+import Image from 'next/image'; // Importing Image for logo
 
 export default function SignUp() {
     useEffect(() => {
@@ -70,7 +71,7 @@ export default function SignUp() {
         }
 
         if (!validatePassword(password)) {
-            setPasswordError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+            setPasswordError("Password must be at least 8 characters long and include uppercase, lowercase letters, numbers, and special characters.");
             valid = false;
         } else {
             setPasswordError("");
@@ -183,19 +184,24 @@ export default function SignUp() {
     }
 
     return (
-        <>
-            <Head>
-                <title>{`Sign Up - ${appName}`}</title>
-                <meta name="description" content={`Create an account on ${appName} - AI-Powered Exam Sheet Evaluator. Enjoy seamless access to effortless evaluation.`} />
-            </Head>
-            
+      <>
+          <Head>
+              <title>{`Sign Up - ${appName}`}</title>
+              <meta name="description" content={`Create an account on ${appName} - AI-Powered Exam Sheet Evaluator. Enjoy seamless access to effortless evaluation.`} />
+          </Head>
+          
           <main className="min-h-screen flex flex-col md:flex-row bg-black"> {/* Changed background to black */}
               {/* Sidebar */}
-              <div className="hidden md:flex md:w-1/2 lg:w-2/3 bg-gradient-to-br from-indigo-600 to-purple-600 items-center justify-center p-10">
+              <div className="hidden md:flex md:w-1/2 lg:w-2/3 items-center justify-center p-10">
                   <div className="text-white max-w-md">
                       <Link href="/">
-                          <h1 className="text-5xl font-bold mb-4 flex items-center">
-                              🤖 {appName} 📝
+                          <h1 className="mb-4 flex items-center">
+                              <Image 
+                                  src="https://gradelab.io/wp-content/uploads/2024/10/gradelab-white.png" 
+                                  alt="GradeLab logo" 
+                                  width={200} // Increased size for better visibility
+                                  height={200} // Increased size for better visibility
+                              /> 
                           </h1>
                       </Link>
                       <p className="text-xl">
@@ -262,7 +268,7 @@ export default function SignUp() {
                           <input 
                               id="verificationCode"
                               type="text"
-                              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400`}
                               placeholder="Verification Code"
                               value={verificationCode}
                               onChange={(e) => setVerificationCode(e.target.value)}
@@ -284,7 +290,7 @@ export default function SignUp() {
                           <button 
                               onClick={verifyEmail} 
                               disabled={loading} 
-                              className={`w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+                              className={`w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors ${loading ? 'cursor-notAllowed opacity50' : ''}`}
                           >
                               {loading ? 'Verifying...' : 'Verify Email & Sign Up'}
                           </button>
