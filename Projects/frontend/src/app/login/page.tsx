@@ -98,7 +98,7 @@ export default function Login() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Login to ${appName} - AI-Powered Exam Sheet Evaluator.`} />
             </Head>
-            <main className="min-h-screen flex flex-col md:flex-row" style={{ background: 'linear-gradient(135deg, #c9ee80 5%, #000001 95%)', animation: 'gradient 15s ease infinite' }}>
+            <main className="min-h-screen flex flex-col md:flex-row" style={{ background: 'linear-gradient(135deg, #c9ee80 0%, #000001 100%)', animation: 'gradient 15s ease infinite' }}>
                 {/* Sidebar */}
                 <div className="hidden md:flex md:w-1/2 lg:w-2/3 items-center justify-center p-10">
                     <div className="text-white max-w-md">
