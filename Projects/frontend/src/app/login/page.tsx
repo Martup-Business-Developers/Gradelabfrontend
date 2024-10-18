@@ -98,19 +98,18 @@ export default function Login() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Login to ${appName} - AI-Powered Exam Sheet Evaluator.`} />
             </Head>
-            <main className="min-h-screen flex flex-col md:flex-row" style={{ background: '#c9ee80' }}> {/* Changed background color */}
+            <main className="min-h-screen flex flex-col md:flex-row" style={{ background: 'linear-gradient(135deg, #c9ee80 25%, #000001 75%)', animation: 'gradient 15s ease infinite' }}>
                 {/* Sidebar */}
-                <div className="hidden md:flex md:w-1/2 lg:w-2/3 bg-black items-center justify-center p-10"> {/* Changed to dark background */}
+                <div className="hidden md:flex md:w-1/2 lg:w-2/3 items-center justify-center p-10">
                     <div className="text-white max-w-md">
                         <Link href="/">
                             <h1 className="text-5xl font-bold mb-4 flex items-center">
                                 <Image 
                                     src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png" 
                                     alt="GradeLab logo" 
-                                    width={50} 
-                                    height={50} 
+                                    width={100} // Increased size
+                                    height={100} // Increased size
                                 /> 
-                                {/* Removed appName */}
                             </h1>
                         </Link>
                         <p className="text-xl">
@@ -179,6 +178,15 @@ export default function Login() {
                     />
                 </div>
             </main>
+            
+            {/* CSS for Gradient Animation */}
+            <style jsx>{`
+                @keyframes gradient {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                }
+            `}</style>
         </>
     );
 }
