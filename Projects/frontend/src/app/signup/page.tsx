@@ -197,7 +197,7 @@ export default function SignUp() {
                       <Link href="/">
                           <h1 className="mb-4 flex items-center">
                               <Image 
-                                  src="https://gradelab.io/wp-content/uploads/2024/10/gradelab-white.png" 
+                                  src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-white.png" 
                                   alt="GradeLab logo" 
                                   width={200} // Increased size for better visibility
                                   height={200} // Increased size for better visibility
