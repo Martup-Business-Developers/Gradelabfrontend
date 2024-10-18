@@ -98,7 +98,7 @@ export default function Login() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Login to ${appName} - AI-Powered Exam Sheet Evaluator.`} />
             </Head>
-            <main className="min-h-screen flex flex-col md:flex-row" style={{ background: 'linear-gradient(135deg, #c9ee80 25%, #000001 75%)', animation: 'gradient 15s ease infinite' }}>
+            <main className="min-h-screen flex flex-col md:flex-row" style={{ background: 'linear-gradient(135deg, #c9ee80 5%, #000001 95%)', animation: 'gradient 15s ease infinite' }}>
                 {/* Sidebar */}
                 <div className="hidden md:flex md:w-1/2 lg:w-2/3 items-center justify-center p-10">
                     <div className="text-white max-w-md">
@@ -107,8 +107,8 @@ export default function Login() {
                                 <Image 
                                     src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png" 
                                     alt="GradeLab logo" 
-                                    width={100} // Increased size
-                                    height={100} // Increased size
+                                    width={200} // Increased size
+                                    height={200} // Increased size
                                 /> 
                             </h1>
                         </Link>
