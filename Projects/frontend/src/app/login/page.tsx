@@ -1,4 +1,5 @@
 "use client";
+
 import axios from 'axios';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -6,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { appName, serverURL } from '@/utils/utils';
 import { ToastContainer, toast } from 'react-toastify';
 import Head from 'next/head';
+import Image from 'next/image'; // Importing Image for logo
 
 export default function Login() {
     useEffect(() => {
@@ -102,7 +104,13 @@ export default function Login() {
                     <div className="text-white max-w-md">
                         <Link href="/">
                             <h1 className="text-5xl font-bold mb-4 flex items-center">
-                                🤖 {appName} 📝
+                                <Image 
+                                    src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png" 
+                                    alt="Logo" 
+                                    width={50} 
+                                    height={50} 
+                                /> 
+                                {appName}
                             </h1>
                         </Link>
                         <p className="text-xl">
