@@ -98,19 +98,19 @@ export default function Login() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Login to ${appName} - AI-Powered Exam Sheet Evaluator.`} />
             </Head>
-            <main className="min-h-screen flex flex-col md:flex-row bg-gray-100">
+            <main className="min-h-screen flex flex-col md:flex-row" style={{ background: '#c9ee80' }}> {/* Changed background color */}
                 {/* Sidebar */}
-                <div className="hidden md:flex md:w-1/2 lg:w-2/3 bg-gradient-to-br from-indigo-600 to-purple-600 items-center justify-center p-10">
+                <div className="hidden md:flex md:w-1/2 lg:w-2/3 bg-black items-center justify-center p-10"> {/* Changed to dark background */}
                     <div className="text-white max-w-md">
                         <Link href="/">
                             <h1 className="text-5xl font-bold mb-4 flex items-center">
                                 <Image 
                                     src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png" 
-                                    alt="Logo" 
+                                    alt="GradeLab logo" 
                                     width={50} 
                                     height={50} 
                                 /> 
-                                {appName}
+                                {/* Removed appName */}
                             </h1>
                         </Link>
                         <p className="text-xl">
