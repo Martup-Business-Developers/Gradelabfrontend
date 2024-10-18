@@ -98,17 +98,17 @@ export default function Login() {
                 <title>{`Login - ${appName}`}</title>
                 <meta name="description" content={`Login to ${appName} - AI-Powered Exam Sheet Evaluator.`} />
             </Head>
-            <main className="min-h-screen flex flex-col md:flex-row" style={{ background: 'linear-gradient(135deg, #c9ee80 0%, #000001 100%)', animation: 'gradient 15s ease infinite' }}>
+            <main className="min-h-screen flex flex-col md:flex-row bg-black"> {/* Set background to black */}
                 {/* Sidebar */}
                 <div className="hidden md:flex md:w-1/2 lg:w-2/3 items-center justify-center p-10">
                     <div className="text-white max-w-md">
                         <Link href="/">
                             <h1 className="text-5xl font-bold mb-4 flex items-center">
                                 <Image 
-                                    src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png" 
+                                    src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-white.png" 
                                     alt="GradeLab logo" 
-                                    width={200} // Increased size
-                                    height={200} // Increased size
+                                    width={150} // Increased size for better visibility
+                                    height={150} // Increased size for better visibility
                                 /> 
                             </h1>
                         </Link>
@@ -178,15 +178,6 @@ export default function Login() {
                     />
                 </div>
             </main>
-            
-            {/* CSS for Gradient Animation */}
-            <style jsx>{`
-                @keyframes gradient {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                }
-            `}</style>
         </>
     );
 }
