@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { FiUser } from "react-icons/fi"; // Importing an icon for the user
+import { MainContext } from "@/context/context"; // Importing your context
 
 const FeatureCard = ({ icon, title, description }) => (
   <motion.div
@@ -19,7 +20,15 @@ const FeatureCard = ({ icon, title, description }) => (
   </motion.div>
 );
 
-export default function Home({ user }) {
+export default function Home() {
+  const {
+    moreMenuOpen,
+    setMoreMenuOpen,
+    showMenu,
+    setShowMenu,
+    user, // Accessing user from context
+  } = useContext(MainContext); // Ensure you're accessing MainContext
+
   const [typedText, setTypedText] = useState('');
   const [welcomeText, setWelcomeText] = useState('');
   const fullText = `Create a new evaluator or select an existing one to get started.`;
@@ -86,7 +95,7 @@ export default function Home({ user }) {
             <span><FiUser /></span>
           </div>
         </div>
-        <p className='font-semibold text-black'>{user?.name}</p> {/* Displaying username */}
+        <p className='font-semibold'>{user?.name || "Guest"}</p> {/* Displaying username or fallback */}
       </div>
 
       <motion.div
