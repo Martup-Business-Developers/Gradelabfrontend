@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { FiUser } from "react-icons/fi"; // Importing an icon for the user
 
 const FeatureCard = ({ icon, title, description }) => (
   <motion.div
@@ -22,7 +23,7 @@ export default function Home({ user }) {
   const [typedText, setTypedText] = useState('');
   const [welcomeText, setWelcomeText] = useState('');
   const fullText = `Create a new evaluator or select an existing one to get started.`;
-  const welcomeFullText = user ? `Welcome back, ${user?.name}!` : 'Welcome!';
+  const welcomeFullText = user ? `Welcome back, ${user.name}!` : 'Welcome!';
 
   useEffect(() => {
     let index = 0;
@@ -65,7 +66,7 @@ export default function Home({ user }) {
   ];
 
   return (
-    <div className='select-none flex flex-col justify-center items-center w-full min-h-screen bg-gradient-to-b from-base-200 to-base-300 p-6 rounded-lg shadow-lg'>
+    <div className='select-none flex flex-col justify-center items-center w-full min-h-screen bg-white p-6 rounded-lg shadow-lg'>
       
       {/* Sticky Logo Section */}
       <div className="sticky top-0 z-10 text-center mb-6">
@@ -78,13 +79,23 @@ export default function Home({ user }) {
         />
       </div>
 
+      {/* User Info Section */}
+      <div className="flex items-center mb-4">
+        <div className="avatar placeholder mr-2">
+          <div className="bg-blue-700 text-white mask mask-squircle w-10">
+            <span><FiUser /></span>
+          </div>
+        </div>
+        <p className='font-semibold text-black'>{user?.name}</p> {/* Displaying username */}
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="text-center"
       >
-        <p className='text-2xl font-semibold mb-4 text-black'>{welcomeText}</p> {/* Changed color to black */}
+        <p className='text-2xl font-semibold mb-4 text-black'>{welcomeText}</p> {/* Welcome text color is black */}
         <p className='text-xl mb-8 h-12'>{typedText}</p>
       </motion.div>
       
