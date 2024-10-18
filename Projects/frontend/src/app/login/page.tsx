@@ -107,8 +107,8 @@ export default function Login() {
                                 <Image 
                                     src="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-white.png" 
                                     alt="GradeLab logo" 
-                                    width={150} // Increased size for better visibility
-                                    height={150} // Increased size for better visibility
+                                    width={200} // Increased size for better visibility
+                                    height={200} // Increased size for better visibility
                                 /> 
                             </h1>
                         </Link>
