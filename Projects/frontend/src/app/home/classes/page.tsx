@@ -1,6 +1,6 @@
 "use client";
 import { useContext } from "react";
-import { FiUser, FiEdit, FiTrash, FiPlusCircle, FiUsers, FiBook, FiHash, FiPrinter } from "react-icons/fi";
+import { FiUser, FiEdit, FiTrash, FiPlusCircle, FiUsers, FiBook, FiHash, FiPrinter, FiMail } from "react-icons/fi";
 import { MainContext } from "@/context/context";
 import { appName } from "@/utils/utils";
 
@@ -14,6 +14,8 @@ export default function Classes() {
     setNewStudentName,
     newStudentRollNo,
     setNewStudentRollNo,
+    newStudentEmail,
+    setNewStudentEmail,
     setDeleteStudentRollNo,
     addStudent,
     deleteStudent,
@@ -21,6 +23,8 @@ export default function Classes() {
     setEditStudentRollNo,
     editStudentName,
     setEditStudentName,
+    editStudentEmail,
+    setEditStudentEmail,
     editStudent
   } = useContext(MainContext);
 
@@ -66,6 +70,7 @@ export default function Classes() {
             <tr>
               <th>RollNo</th>
               <th>Name</th>
+              <th>Email</th>
               <th className="print">Edit</th>
               <th className="print">Delete</th>
             </tr>
@@ -76,9 +81,11 @@ export default function Classes() {
                 <tr key={i}>
                   <th>{student?.rollNo}</th>
                   <td>{student?.name}</td>
+                  <td>{student?.email}</td>
                   <td className="print"><label htmlFor="editstudent_modal" className="btn btn-square" onClick={() => {
                     setEditStudentRollNo(student.rollNo);
                     setEditStudentName(student.name);
+                    setEditStudentEmail(student.email);
                   }}><FiEdit /></label></td>
                   <td className="print"><label htmlFor="deletestudent_modal" className="btn btn-square" onClick={() => setDeleteStudentRollNo(student.rollNo)}><FiTrash /></label></td>
                 </tr>
@@ -96,6 +103,8 @@ export default function Classes() {
           <input className="input input-bordered w-full" placeholder="Roll No" type="number" onChange={(x) => setNewStudentRollNo(parseInt(x.target.value))} value={newStudentRollNo} />
           <p className="flex items-center py-4"><FiUser className='mr-2' />Student Name</p>
           <input className="input input-bordered w-full" placeholder="Student Name" type="text" onChange={(x) => setNewStudentName(x.target.value)} value={newStudentName} />
+          <p className="flex items-center py-4"><FiMail className='mr-2' />Email</p>
+          <input className="input input-bordered w-full" placeholder="Email" type="email" onChange={(x) => setNewStudentEmail(x.target.value)} value={newStudentEmail} />
           <div className="modal-action">
             <label htmlFor="newstudent_modal" className="btn">Cancel</label>
             <label htmlFor="newstudent_modal" className="btn btn-primary" onClick={() => addStudent()}>Add Student</label>
@@ -125,9 +134,11 @@ export default function Classes() {
           <p className="flex items-center py-4">{editStudentRollNo}</p>
           <p className="flex items-center py-4"><FiUser className='mr-2' />Student Name</p>
           <input className="input input-bordered w-full" placeholder="Student Name" type="text" onChange={(x) => setEditStudentName(x.target.value)} value={editStudentName} />
+          <p className="flex items-center py-4"><FiMail className='mr-2' />Email</p>
+          <input className="input input-bordered w-full" placeholder="Email" type="email" onChange={(x) => setEditStudentEmail(x.target.value)} value={editStudentEmail} />
           <div className="modal-action">
             <label htmlFor="editstudent_modal" className="btn">Cancel</label>
-            <label htmlFor="editstudent_modal" className="btn btn-primary" onClick={() => editStudent()}>Save</label>
+            <label htmlFor="editstudent_modal" className="btn btn-primary" onClick={() => editStudent()}>Save Changes</label>
           </div>
         </div>
         <label className="modal-backdrop" htmlFor="editstudent_modal">Cancel</label>
