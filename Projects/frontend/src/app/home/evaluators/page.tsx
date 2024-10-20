@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useContext, useEffect, useRef } from "react";
 import { FiBook, FiCheck, FiExternalLink, FiFileText, FiImage, FiInfo, FiKey, FiShoppingCart, FiUsers, FiX } from "react-icons/fi";
 import { MainContext } from "@/context/context";
