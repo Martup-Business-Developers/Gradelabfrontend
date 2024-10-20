@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useContext, useEffect, useRef } from "react";
-import { FiBook, FiCheck, FiExternalLink, FiFileText, FiImage, FiInfo, FiKey, FiShoppingCart, FiUsers, FiX } from "react-icons/fi";
+import { FiBook, FiCheck, FiFileText, FiInfo, FiKey, FiUsers, FiX } from "react-icons/fi";
 import { MainContext } from "@/context/context";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { toast } from "react-toastify";
@@ -16,7 +16,6 @@ export default function Evaluators() {
     setSelectedEvaluator,
     getStudents,
     students,
-    updateEvaluation,
     getEvaluation,
     answerSheets,
     setAnswerSheets,
@@ -24,9 +23,7 @@ export default function Evaluators() {
     evaluating,
     setEvaluating,
     evaluationData,
-    setImgPreviewURL,
-    imgPreviewURL,
-    limits
+    setImgPreviewURL
   } = useContext(MainContext);
 
   const limitExceedModalRef = useRef(null);
@@ -50,13 +47,11 @@ export default function Evaluators() {
         setEvaluating(-1);
         toast.error("Evaluation failed! Please try again later.");
         return;
-      }
-      else if (val === -2) {
+      } else if (val === -2) {
         setEvaluating(-1);
         limitExceedModalRef.current?.click();
         return;
-      }
-      else if (val === -1) {
+      } else if (val === -1) {
         setEvaluating(-1);
         toast.error("Evaluation failed! Please try again later.");
         return;
@@ -129,7 +124,7 @@ export default function Evaluators() {
           </div>
 
           {/* Answer Keys */}
-          <div className="mb=8">
+          <div className='mb=8'>
             <h3 className='text-xl font-semibold mb=4 flex items-center'><FiKey className='mr=2' /> Answer Key / Criteria</h3>
             <div className='grid grid-cols=2 md:grid-cols=4 lg:grid-cols=6 gap=4'>
               {evaluators[selectedEvaluator]?.answerKeys.map((file, i) => (
@@ -146,7 +141,14 @@ export default function Evaluators() {
             <h3 className='text-xl font-semibold mb=4 flex items-center'><FiFileText className='mr=2' /> Upload answer sheets</h3>
             {students?.length === 0 ? (
               // No Students Message
-              ...
+              <div className='bg-blue=50 border-l=4 border-blue=500 p=4 mb=6'>
+                <div className='flex'>
+                  <FiInfo className='flex-shrink=0 h=5 w=5 text-blue=500' />
+                  <p>No students in the selected class!</p> {/* Adjusted message */}
+                </div>
+                {/* Link to add students */}
+                {/*<Link href='/home/classes' ... />*/}
+              </div> 
             ) : (
               students?.map((student, i) => (
                 // Student Information and Upload Area
