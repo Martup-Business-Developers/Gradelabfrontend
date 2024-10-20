@@ -23,7 +23,7 @@ export default function Evaluators() {
     evaluating,
     setEvaluating,
     evaluationData,
-    setImgPreviewURL
+    setImgPreviewURL,
   } = useContext(MainContext);
 
   const limitExceedModalRef = useRef(null);
@@ -112,25 +112,23 @@ export default function Evaluators() {
 
           {/* Question Papers */}
           <div className="mb-8">
-            <h3 className="text-xl font-semibold mb=4 flex items-center"><FiFileText className="mr=2" /> Question Paper(s)</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap=4">
+            <h3 className="text-xl font-semibold mb-4 flex items-center"><FiFileText className="mr-2" /> Question Paper(s)</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {evaluators[selectedEvaluator]?.questionPapers.map((file, i) => (
                 <label key={i} htmlFor="preview_modal" onClick={() => setImgPreviewURL(file)}>
-                  {/* Thumbnail size adjustment */}
-                  <img src={file} className="w-16 h-16 object-cover rounded-lg shadow-md hover:shadow-lg transition duration=300 cursor-pointer" alt={`Question Paper ${i + 1}`} />
+                  <img src={file} className="w-16 h-16 object-cover rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer" alt={`Question Paper ${i + 1}`} />
                 </label>
               ))}
             </div>
           </div>
 
           {/* Answer Keys */}
-          <div className='mb=8'>
-            <h3 className='text-xl font-semibold mb=4 flex items-center'><FiKey className='mr=2' /> Answer Key / Criteria</h3>
-            <div className='grid grid-cols=2 md:grid-cols=4 lg:grid-cols=6 gap=4'>
+          <div className='mb-8'>
+            <h3 className='text-xl font-semibold mb-4 flex items-center'><FiKey className='mr-2' /> Answer Key / Criteria</h3>
+            <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4'>
               {evaluators[selectedEvaluator]?.answerKeys.map((file, i) => (
                 <label key={i} htmlFor='preview_modal' onClick={() => setImgPreviewURL(file)}>
-                  {/* Thumbnail size adjustment */}
-                  <img src={file} className='w-16 h-16 object-cover rounded-lg shadow-md hover:shadow-lg transition duration=300 cursor-pointer' alt={`Answer Key ${i + 1}`} />
+                  <img src={file} className='w-16 h-16 object-cover rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer' alt={`Answer Key ${i + 1}`} />
                 </label>
               ))}
             </div>
@@ -138,17 +136,14 @@ export default function Evaluators() {
 
           {/* Upload Answer Sheets */}
           <div>
-            <h3 className='text-xl font-semibold mb=4 flex items-center'><FiFileText className='mr=2' /> Upload answer sheets</h3>
+            <h3 className='text-xl font-semibold mb-4 flex items-center'><FiFileText className='mr-2' /> Upload answer sheets</h3>
             {students?.length === 0 ? (
-              // No Students Message
-              <div className='bg-blue=50 border-l=4 border-blue=500 p=4 mb=6'>
+              <div className='bg-blue-50 border-l-4 border-blue-500 p-4 mb-6'>
                 <div className='flex'>
-                  <FiInfo className='flex-shrink=0 h=5 w=5 text-blue=500' />
-                  <p>No students in the selected class!</p> {/* Adjusted message */}
+                  <FiInfo className='flex-shrink-0 h-5 w-5 text-blue-500' />
+                  <p>No students in the selected class!</p>
                 </div>
-                {/* Link to add students */}
-                {/*<Link href='/home/classes' ... />*/}
-              </div> 
+              </div>
             ) : (
               students?.map((student, i) => (
                 // Student Information and Upload Area
@@ -159,8 +154,8 @@ export default function Evaluators() {
 
           {/* Limit Exceeded Modal */}
           ...
-        </div> 
+        </div>
       )}
-    </div> 
+    </div>
   );
 }
