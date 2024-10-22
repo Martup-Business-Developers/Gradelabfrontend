@@ -10,9 +10,10 @@ import EmailVerification from "../models/EmailVerification.js";
 import nodemailer from "nodemailer";
 import smtpTransport from "nodemailer-smtp-transport";
 import Limits from "../models/Limits.js";
-import rateLimit from "express-rate-limit"; // Import express-rate-limit
+import rateLimit from "express-rate-limit"; 
 
 dotenv.config();
+
 
 const router = express.Router();
 
@@ -128,10 +129,10 @@ async function sendEmail(email, res) {
         subject: `Verify your email address`,
         attachments: [
             {
-                filename: `${process.env.APP_NAME}.png`,
-                path: logoBase64, //base64 image of logo
-                cid: "logo",
-            },
+    filename: `${process.env.APP_NAME}.png`,
+    path: "https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png", // Updated logo image link
+    cid: "logo",
+},
         ],
         html: `<div style="height:100%;background:black;color:white;padding:40px;"><center>${logoHTML}<br/><h2>Verify your email</h2></center><br/><p style="font-size:18px;">${process.env.APP_NAME} verification code: <b>${code.toString()}</b></p><br/><br/></div>`,
     };
