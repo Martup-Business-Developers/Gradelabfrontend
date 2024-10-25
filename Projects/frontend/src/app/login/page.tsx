@@ -28,7 +28,7 @@ export default function Login() {
 
     // Validation Functions
     const validateEmail = (email: string) => {
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org)$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|io|org)$/;
         return emailRegex.test(email);
     };
 
