@@ -17,6 +17,14 @@ const openai = new OpenAI({
 
 const router = express.Router();
 
+// Helper function to format image URLs for OpenAI Vision API
+const formatImageUrl = (url) => ({
+    type: "image_url",
+    image_url: {
+        url: url
+    }
+});
+
 //EVALUATORS
 router.get("/evaluators", validate, async (req, res) => {
     const evaluators = await Evaluator.find({ userId: req.user._id }).lean();
@@ -51,7 +59,6 @@ router.post("/evaluators/create", validate, async (req, res) => {
         }
 
         limits.evaluatorLimit -= 1;
-
         await limits.save();
 
         const evaluator = new Evaluator({
@@ -65,8 +72,7 @@ router.post("/evaluators/create", validate, async (req, res) => {
         await evaluator.save();
 
         return res.send(evaluator);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send(err);
     }
 });
@@ -80,28 +86,23 @@ router.post("/evaluators/delete", validate, async (req, res) => {
         const data = await schema.validateAsync(req.body);
 
         const evaluator = await Evaluator.findById(data.evaluatorId);
-
         if (!evaluator) {
             return res.status(400).send("Evaluator not found");
         }
 
-        if (evaluator.userId.toString() != req.user._id.toString()) {
+        if (evaluator.userId.toString() !== req.user._id.toString()) {
             return res.status(400).send("Unauthorized");
         }
 
         const limits = await Limits.findOne({ userId: req.user._id });
-
         limits.evaluatorLimit += 1;
-
         await limits.save();
 
         await Evaluator.findByIdAndDelete(data.evaluatorId);
-
         await Evaluation.deleteOne({ evaluatorId: data.evaluatorId });
 
         return res.send("Evaluator deleted");
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send(err);
     }
 });
@@ -117,23 +118,20 @@ router.post("/evaluators/update", validate, async (req, res) => {
         const data = await schema.validateAsync(req.body);
 
         const evaluator = await Evaluator.findById(data.evaluatorId);
-
         if (!evaluator) {
             return res.status(400).send("Evaluator not found");
         }
 
-        if (evaluator.userId.toString() != req.user._id.toString()) {
+        if (evaluator.userId.toString() !== req.user._id.toString()) {
             return res.status(400).send("Unauthorized");
         }
 
         evaluator.title = data.title;
         evaluator.classId = data.classId;
-
         await evaluator.save();
 
         return res.send(evaluator);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send(err);
     }
 });
@@ -146,9 +144,7 @@ router.post("/evaluators/evaluate", validate, async (req, res) => {
 
     try {
         const data = await schema.validateAsync(req.body);
-
         const evaluator = await Evaluator.findById(data.evaluatorId);
-
         const limit = await Limits.findOne({ userId: req.user._id });
 
         if (limit.evaluationLimit <= 0) {
@@ -159,101 +155,97 @@ router.post("/evaluators/evaluate", validate, async (req, res) => {
             return res.status(400).send("Evaluator not found");
         }
 
-        if (evaluator.userId.toString() != req.user._id.toString()) {
+        if (evaluator.userId.toString() !== req.user._id.toString()) {
             return res.status(400).send("Unauthorized");
         }
 
         const evaluation = await Evaluation.findOne({ evaluatorId: data.evaluatorId });
-
         if (!evaluation) {
             return res.status(400).send("Evaluation not found");
         }
 
         const answerSheets = evaluation.answerSheets[data.rollNo - 1];
-
         if (!answerSheets) {
             return res.send(null);
         }
 
         const classData = await Class.findById(evaluator.classId);
 
-        for (const answerSheet of evaluation.answerSheets) {
-            if (answerSheet == null) {
-                await Evaluation.updateOne({ evaluatorId: data.evaluatorId }, { $set: { ["data." + (evaluation.answerSheets.indexOf(answerSheet) + 1)]: null } });
+        // Handle null answer sheets
+        for (let i = 0; i < evaluation.answerSheets.length; i++) {
+            if (evaluation.answerSheets[i] === null) {
+                await Evaluation.updateOne(
+                    { evaluatorId: data.evaluatorId },
+                    { $set: { [`data.${i + 1}`]: null } }
+                );
             }
         }
 
-        var questionPapersPrompt = [];
-        var answerKeysPrompt = [];
-        var answerSheetsPrompt = [];
-
-        questionPapersPrompt.push({ type: "text", text: "Question Paper(s):" });
-        for (const questionPaper of evaluator.questionPapers) {
-            questionPapersPrompt.push({ type: "image_url", image_url: questionPaper });
-        }
-
-        answerKeysPrompt.push({ type: "text", text: "Answer Key(s):" });
-        for (const answerKey of evaluator.answerKeys) {
-            answerKeysPrompt.push({ type: "image_url", image_url: answerKey });
-        }
-
-        answerSheetsPrompt.push({ type: "text", text: "Answer Sheet(s):" });
-        for (const answerSheet of answerSheets) {
-            answerSheetsPrompt.push({ type: "image_url", image_url: answerSheet });
-        }
-
-        var messages = [
+        // Prepare prompts with correct image URL formatting
+        const messages = [
             {
                 role: "system",
                 content: aiPrompt,
             },
             {
                 role: "user",
-                content: questionPapersPrompt,
+                content: [
+                    { type: "text", text: "Question Paper(s):" },
+                    ...evaluator.questionPapers.map(url => formatImageUrl(url))
+                ]
             },
             {
                 role: "user",
-                content: answerKeysPrompt,
+                content: [
+                    { type: "text", text: "Answer Key(s):" },
+                    ...evaluator.answerKeys.map(url => formatImageUrl(url))
+                ]
             },
             {
                 role: "user",
-                content: "student_name: " + classData.students[data.rollNo - 1].name,
+                content: `student_name: ${classData.students[data.rollNo - 1].name}`
             },
             {
                 role: "user",
-                content: "roll_no: " + classData.students[data.rollNo - 1].rollNo,
+                content: `roll_no: ${classData.students[data.rollNo - 1].rollNo}`
             },
             {
                 role: "user",
-                content: "class: " + classData.name + " " + classData.section,
+                content: `class: ${classData.name} ${classData.section}`
             },
             {
                 role: "user",
-                content: "subject: " + classData.subject,
+                content: `subject: ${classData.subject}`
             },
             {
                 role: "user",
-                content: answerSheetsPrompt,
-            },
+                content: [
+                    { type: "text", text: "Answer Sheet(s):" },
+                    ...answerSheets.map(url => formatImageUrl(url))
+                ]
+            }
         ];
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-4-vision-preview",
+            model: "gpt-4o-mini",
             messages: messages,
             max_tokens: 1000,
         });
 
-        const resp = completion.choices[0].message.content;
+        const respData = JSON.parse(completion.choices[0].message.content);
 
-        const respData = JSON.parse(resp);
+        await Evaluation.updateOne(
+            { evaluatorId: data.evaluatorId },
+            { $set: { [`data.${data.rollNo}`]: respData } }
+        );
 
-        await Evaluation.updateOne({ evaluatorId: data.evaluatorId }, { $set: { ["data." + (data.rollNo)]: respData } });
-
-        await Limits.updateOne({ userId: req.user._id }, { $inc: { evaluationLimit: -1 } });
+        await Limits.updateOne(
+            { userId: req.user._id },
+            { $inc: { evaluationLimit: -1 } }
+        );
 
         return res.send(respData);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send(err);
     }
 });
@@ -267,9 +259,7 @@ router.post("/evaluators/revaluate", validate, async (req, res) => {
 
     try {
         const data = await schema.validateAsync(req.body);
-
         const evaluator = await Evaluator.findById(data.evaluatorId);
-
         const limit = await Limits.findOne({ userId: req.user._id });
 
         if (limit.evaluationLimit <= 0) {
@@ -280,101 +270,101 @@ router.post("/evaluators/revaluate", validate, async (req, res) => {
             return res.status(400).send("Evaluator not found");
         }
 
-        if (evaluator.userId.toString() != req.user._id.toString()) {
+        if (evaluator.userId.toString() !== req.user._id.toString()) {
             return res.status(400).send("Unauthorized");
         }
 
         const evaluation = await Evaluation.findOne({ evaluatorId: data.evaluatorId });
-
         if (!evaluation) {
             return res.status(400).send("Evaluation not found");
         }
 
         const answerSheets = evaluation.answerSheets[data.rollNo - 1];
-
         if (!answerSheets) {
             return res.send(null);
         }
 
         const classData = await Class.findById(evaluator.classId);
 
-        for (const answerSheet of evaluation.answerSheets) {
-            if (answerSheet == null) {
-                await Evaluation.updateOne({ evaluatorId: data.evaluatorId }, { $set: { ["data." + (evaluation.answerSheets.indexOf(answerSheet) + 1)]: null } });
+        // Handle null answer sheets
+        for (let i = 0; i < evaluation.answerSheets.length; i++) {
+            if (evaluation.answerSheets[i] === null) {
+                await Evaluation.updateOne(
+                    { evaluatorId: data.evaluatorId },
+                    { $set: { [`data.${i + 1}`]: null } }
+                );
             }
         }
 
-        var questionPapersPrompt = [];
-        var answerKeysPrompt = [];
-        var answerSheetsPrompt = [];
+        const customPrompt = data.prompt && data.prompt !== "null" 
+            ? `${aiPrompt}\n\nTHIS IS REVALUATION. PROMPT: ${data.prompt}\nGive remarks as 'Revaluated' for all questions extra remarks applied to.`
+            : aiPrompt;
 
-        questionPapersPrompt.push({ type: "text", text: "Question Paper(s):" });
-        for (const questionPaper of evaluator.questionPapers) {
-            questionPapersPrompt.push({ type: "image_url", image_url: questionPaper });
-        }
-
-        answerKeysPrompt.push({ type: "text", text: "Answer Key(s):" });
-        for (const answerKey of evaluator.answerKeys) {
-            answerKeysPrompt.push({ type: "image_url", image_url: answerKey });
-        }
-
-        answerSheetsPrompt.push({ type: "text", text: "Answer Sheet(s):" });
-        for (const answerSheet of answerSheets) {
-            answerSheetsPrompt.push({ type: "image_url", image_url: answerSheet });
-        }
-
-        var messages = [
+        // Prepare prompts with correct image URL formatting
+        const messages = [
             {
                 role: "system",
-                content: data.prompt && data.prompt !== "null" ? (aiPrompt + "\n\nTHIS IS REVALUATION. PROMPT: " + data.prompt + "\nGive remarks as 'Revaluated' for all questions extra remarks applied to.") : aiPrompt,
+                content: customPrompt
             },
             {
                 role: "user",
-                content: questionPapersPrompt,
+                content: [
+                    { type: "text", text: "Question Paper(s):" },
+                    ...evaluator.questionPapers.map(url => formatImageUrl(url))
+                ]
             },
             {
                 role: "user",
-                content: answerKeysPrompt,
+                content: [
+                    { type: "text", text: "Answer Key(s):" },
+                    ...evaluator.answerKeys.map(url => formatImageUrl(url))
+                ]
             },
             {
                 role: "user",
-                content: "student_name: " + classData.students[data.rollNo - 1].name,
+                content: `student_name: ${classData.students[data.rollNo - 1].name}`
             },
             {
                 role: "user",
-                content: "roll_no: " + classData.students[data.rollNo - 1].rollNo,
+                content: `roll_no: ${classData.students[data.rollNo - 1].rollNo}`
             },
             {
                 role: "user",
-                content: "class: " + classData.name + " " + classData.section,
+                content: `class: ${classData.name} ${classData.section}`
             },
             {
                 role: "user",
-                content: "subject: " + classData.subject,
+                content: `subject: ${classData.subject}`
             },
             {
                 role: "user",
-                content: answerSheetsPrompt,
-            },
+                content: [
+                    { type: "text", text: "Answer Sheet(s):" },
+                    ...answerSheets.map(url => formatImageUrl(url))
+                ]
+            }
         ];
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-4-vision-preview",
+            model: "gpt-4o-mini",
             messages: messages,
             max_tokens: 1000,
         });
 
-        const resp = completion.choices[0].message.content;
+        const respData = JSON.parse(completion.choices[0].message.content);
 
-        const respData = JSON.parse(resp);
+        await Evaluation.updateOne(
+            { evaluatorId: data.evaluatorId },
+            { $set: { [`data.${data.rollNo}`]: respData } }
+        );
 
-        await Evaluation.updateOne({ evaluatorId: data.evaluatorId }, { $set: { ["data." + (data.rollNo)]: respData } });
-
-        await Limits.updateOne({ userId: req.user._id }, { $inc: { evaluationLimit: -1 } });
+        await Limits.updateOne(
+            { userId: req.user._id },
+            { $inc: { evaluationLimit: -1 } }
+        );
 
         return res.send(respData);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send(err);
     }
 });
@@ -389,30 +379,31 @@ router.post("/evaluations/get", validate, async (req, res) => {
         const data = await schema.validateAsync(req.body);
 
         const evaluator = await Evaluator.findById(data.evaluatorId);
-
         if (!evaluator) {
             return res.status(400).send("Evaluator not found");
         }
 
-        if (evaluator.userId.toString() != req.user._id.toString()) {
+        if (evaluator.userId.toString() !== req.user._id.toString()) {
             return res.status(400).send("Unauthorized");
         }
 
         const evaluation = await Evaluation.findOne({ evaluatorId: data.evaluatorId });
-
         if (!evaluation) {
             return res.send(null);
         }
 
-        for (const answerSheet of evaluation.answerSheets) {
-            if (answerSheet == null) {
-                await Evaluation.updateOne({ evaluatorId: data.evaluatorId }, { $set: { ["data." + (evaluation.answerSheets.indexOf(answerSheet) + 1)]: null } });
+        // Handle null answer sheets
+        for (let i = 0; i < evaluation.answerSheets.length; i++) {
+            if (evaluation.answerSheets[i] === null) {
+                await Evaluation.updateOne(
+                    { evaluatorId: data.evaluatorId },
+                    { $set: { [`data.${i + 1}`]: null } }
+                );
             }
         }
 
         return res.send(evaluation);
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).send(err);
     }
 });
@@ -427,50 +418,34 @@ router.post("/evaluations/update", validate, async (req, res) => {
         const data = await schema.validateAsync(req.body);
 
         const evaluator = await Evaluator.findById(data.evaluatorId);
-
         if (!evaluator) {
             return res.status(400).send("Evaluator not found");
         }
 
-        if (evaluator.userId.toString() != req.user._id.toString()) {
+        if (evaluator.userId.toString() !== req.user._id.toString()) {
             return res.status(400).send("Unauthorized");
         }
 
+        const answerSheetsData = data.answerSheets.map(sheet => 
+            (!sheet || sheet.length <= 0) ? null : sheet
+        );
+
         const evaluation = await Evaluation.findOne({ evaluatorId: data.evaluatorId });
-
-        var answerSheetsData = [];
-
-        for (var answerSheet of data.answerSheets) {
-            if (answerSheet == null) {
-                answerSheetsData.push(null);
-            }
-            else if (answerSheet.length <= 0) {
-                answerSheetsData.push(null);
-            }
-            else {
-                answerSheetsData.push(answerSheet);
-            }
-        }
-
         if (!evaluation) {
             const newEvaluation = new Evaluation({
                 evaluatorId: data.evaluatorId,
                 data: data.data,
                 answerSheets: answerSheetsData,
             });
-
             await newEvaluation.save();
-
             return res.send(newEvaluation);
         }
 
         evaluation.answerSheets = answerSheetsData;
         await evaluation.save();
-
         return res.send(evaluation);
-    }
-    catch (err) {
-        return res.send(err);
+    } catch (err) {
+        return res.status(500).send(err);
     }
 });
 
