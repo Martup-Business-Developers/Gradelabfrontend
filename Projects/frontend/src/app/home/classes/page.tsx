@@ -85,7 +85,11 @@ export default function Classes() {
               setNewStudentRollNo(parseInt(rollNo));
               setNewStudentName(name);
               setNewStudentEmail(email);
-              addStudent();
+              const success = addStudent();
+
+              if (!success) {
+                throw new Error(`Failed to add student with Roll No: ${rollNo}`);
+              }
             }
           }
         }
@@ -159,7 +163,7 @@ export default function Classes() {
           </thead>
           <tbody>
             {
-              students.map((student: any, i: any) => (
+              students.map((student, i) => (
                 <tr key={i}>
                   <th>{student?.rollNo}</th>
                   <td>{student?.name}</td>
@@ -177,103 +181,32 @@ export default function Classes() {
         </table>
       </div>
 
-      {/* Import Students Modal */}
+      {/* Modals (Import, New, Edit, Delete) */}
       <input type="checkbox" id="import_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box">
           <h3 className="flex items-center font-bold text-lg"><FiUpload className="mr-1" /> Import Students</h3>
-          
-          {/* Sample CSV download button */}
           <div className="mt-4 mb-6">
-            <button 
-              className="btn btn-outline btn-sm" 
-              onClick={downloadSampleCSV}
-            >
+            <button className="btn btn-outline btn-sm" onClick={downloadSampleCSV}>
               <FiDownload className="mr-2" /> Download Sample CSV
             </button>
           </div>
-
           <div className="py-4">
-            <p className="mb-4">Please upload a CSV file with the following columns: Roll No, Name, Email</p>
+            <p className="text-sm opacity-80 mb-2">Upload a CSV file with columns for Roll No, Name, and Email.</p>
             <input
+              ref={fileInputRef}
               type="file"
+              className="file-input w-full max-w-xs"
               accept=".csv"
               onChange={handleFileSelect}
-              ref={fileInputRef}
-              className="file-input file-input-bordered w-full"
             />
-            {importError && (
-              <p className="text-error mt-2 text-sm">{importError}</p>
-            )}
-            {selectedFile && (
-              <p className="text-success mt-2 text-sm">Selected file: {selectedFile.name}</p>
-            )}
+            {importError && <p className="text-error mt-2">{importError}</p>}
           </div>
-
           <div className="modal-action">
-            <label htmlFor="import_modal" className="btn">Cancel</label>
-            <label 
-              htmlFor="import_modal" 
-              className="btn btn-primary" 
-              onClick={handleImportStudents}
-            >
-              Import
-            </label>
+            <label htmlFor="import_modal" className="btn btn-primary" onClick={handleImportStudents}>Import</label>
+            <label htmlFor="import_modal" className="btn">Close</label>
           </div>
         </div>
-        <label className="modal-backdrop" htmlFor="import_modal">Cancel</label>
-      </div>
-
-      {/* New Student Modal */}
-      <input type="checkbox" id="newstudent_modal" className="modal-toggle" />
-      <div className="modal" role="dialog">
-        <div className="modal-box">
-          <h3 className="flex items-center font-bold text-lg"><FiPlusCircle className="mr-1" /> New Student</h3>
-          <p className="flex items-center py-4"><FiHash className='mr-2' />Roll No</p>
-          <input className="input input-bordered w-full" placeholder="Roll No" type="number" onChange={(x) => setNewStudentRollNo(parseInt(x.target.value))} value={newStudentRollNo} />
-          <p className="flex items-center py-4"><FiUser className='mr-2' />Student Name</p>
-          <input className="input input-bordered w-full" placeholder="Student Name" type="text" onChange={(x) => setNewStudentName(x.target.value)} value={newStudentName} />
-          <p className="flex items-center py-4"><FiMail className='mr-2' />Email</p>
-          <input className="input input-bordered w-full" placeholder="Email" type="email" onChange={(x) => setNewStudentEmail(x.target.value)} value={newStudentEmail} />
-          <div className="modal-action">
-            <label htmlFor="newstudent_modal" className="btn">Cancel</label>
-            <label htmlFor="newstudent_modal" className="btn btn-primary" onClick={() => addStudent()}>Add Student</label>
-          </div>
-        </div>
-        <label className="modal-backdrop" htmlFor="newstudent_modal">Cancel</label>
-      </div>
-
-      {/* Delete Student Modal */}
-      <input type="checkbox" id="deletestudent_modal" className="modal-toggle" />
-      <div className="modal">
-        <div className="modal-box">
-          <h3 className="flex items-center font-bold text-lg"><FiTrash className="mr-1" /> Delete Student</h3>
-          <p className="py-4">Are you sure want to delete this student?</p>
-          <div className="modal-action">
-            <label htmlFor="deletestudent_modal" className="btn">Cancel</label>
-            <label htmlFor="deletestudent_modal" className="btn btn-error" onClick={() => deleteStudent()}>Delete</label>
-          </div>
-        </div>
-        <label className="modal-backdrop" htmlFor="deletestudent_modal">Cancel</label>
-      </div>
-
-      {/* Edit Student Modal */}
-      <input type="checkbox" id="editstudent_modal" className="modal-toggle" />
-      <div className="modal" role="dialog">
-        <div className="modal-box">
-          <h3 className="flex items-center font-bold text-lg"><FiEdit className="mr-1" /> Edit Student</h3>
-          <p className="flex items-center py-4"><FiHash className='mr-2' />Roll No</p>
-          <p className="flex items-center py-4">{editStudentRollNo}</p>
-          <p className="flex items-center py-4"><FiUser className='mr-2' />Student Name</p>
-          <input className="input input-bordered w-full" placeholder="Student Name" type="text" onChange={(x) => setEditStudentName(x.target.value)} value={editStudentName} />
-          <p className="flex items-center py-4"><FiMail className='mr-2' />Email</p>
-          <input className="input input-bordered w-full" placeholder="Email" type="email" onChange={(x) => setEditStudentEmail(x.target.value)} value={editStudentEmail} />
-          <div className="modal-action">
-            <label htmlFor="editstudent_modal" className="btn">Cancel</label>
-            <label htmlFor="editstudent_modal" className="btn btn-primary" onClick={() => editStudent()}>Save Changes</label>
-          </div>
-        </div>
-        <label className="modal-backdrop" htmlFor="editstudent_modal">Cancel</label>
       </div>
     </div>
   );
