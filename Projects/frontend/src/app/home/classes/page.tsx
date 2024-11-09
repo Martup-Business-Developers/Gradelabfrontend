@@ -1,6 +1,6 @@
 "use client";
-import { useContext, useState } from "react";
-import { FiUser, FiEdit, FiTrash, FiPlusCircle, FiUsers, FiBook, FiHash, FiPrinter, FiMail, FiUpload } from "react-icons/fi";
+import { useContext, useState, useRef } from "react";
+import { FiUser, FiEdit, FiTrash, FiPlusCircle, FiUsers, FiBook, FiHash, FiPrinter, FiMail, FiUpload, FiDownload } from "react-icons/fi";
 import { MainContext } from "@/context/context";
 import { appName } from "@/utils/utils";
 
@@ -28,42 +28,86 @@ export default function Classes() {
     editStudent
   } = useContext(MainContext);
 
-  // New state for import modal
-  const [importData, setImportData] = useState("");
+  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [importError, setImportError] = useState("");
   
-  // Function to handle importing students
-  const handleImportStudents = () => {
-    try {
-      // Split the pasted data by newlines
-      const lines = importData.trim().split('\n');
-      
-      // Process each line
-      lines.forEach(line => {
-        // Split line by tabs or commas
-        const [rollNo, name, email] = line.split(/[,\t]/).map(item => item.trim());
-        
-        // Validate data
-        if (rollNo && name && email) {
-          // Set the student details
-          setNewStudentRollNo(parseInt(rollNo));
-          setNewStudentName(name);
-          setNewStudentEmail(email);
-          
-          // Add the student
-          addStudent();
-        }
-      });
-      
-      // Clear the import data
-      setImportData("");
-      
-      // Show success message
-      alert("Students imported successfully!");
-      
-    } catch (error) {
-      console.error("Error importing students:", error);
-      alert("Error importing students. Please check the format and try again.");
+  // Function to download sample CSV
+  const downloadSampleCSV = () => {
+    const sampleData = `Roll No,Name,Email
+1,John Doe,john@example.com
+2,Jane Smith,jane@example.com
+3,Bob Wilson,bob@example.com`;
+    
+    const blob = new Blob([sampleData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'sample_students.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  // Function to handle file selection
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === 'text/csv') {
+      setSelectedFile(file);
+      setImportError("");
+    } else {
+      setImportError("Please select a valid CSV file");
+      setSelectedFile(null);
     }
+  };
+
+  // Function to handle importing students from CSV
+  const handleImportStudents = () => {
+    if (!selectedFile) {
+      setImportError("Please select a CSV file first");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const lines = text.split('\n');
+        
+        // Skip header row
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (line) {
+            const [rollNo, name, email] = line.split(',').map(item => item.trim());
+            
+            if (rollNo && name && email) {
+              setNewStudentRollNo(parseInt(rollNo));
+              setNewStudentName(name);
+              setNewStudentEmail(email);
+              addStudent();
+            }
+          }
+        }
+        
+        // Reset file input and state
+        setSelectedFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        alert("Students imported successfully!");
+        
+      } catch (error) {
+        console.error("Error importing students:", error);
+        setImportError("Error processing CSV file. Please check the format and try again.");
+      }
+    };
+
+    reader.onerror = () => {
+      setImportError("Error reading the file. Please try again.");
+    };
+
+    reader.readAsText(selectedFile);
   };
 
   return (
@@ -138,16 +182,43 @@ export default function Classes() {
       <div className="modal" role="dialog">
         <div className="modal-box">
           <h3 className="flex items-center font-bold text-lg"><FiUpload className="mr-1" /> Import Students</h3>
-          <p className="py-4">Paste student data below (Format: Roll No, Name, Email - one student per line)</p>
-          <textarea 
-            className="textarea textarea-bordered w-full h-48"
-            placeholder="1, John Doe, john@example.com&#13;2, Jane Smith, jane@example.com"
-            value={importData}
-            onChange={(e) => setImportData(e.target.value)}
-          />
+          
+          {/* Sample CSV download button */}
+          <div className="mt-4 mb-6">
+            <button 
+              className="btn btn-outline btn-sm" 
+              onClick={downloadSampleCSV}
+            >
+              <FiDownload className="mr-2" /> Download Sample CSV
+            </button>
+          </div>
+
+          <div className="py-4">
+            <p className="mb-4">Please upload a CSV file with the following columns: Roll No, Name, Email</p>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleFileSelect}
+              ref={fileInputRef}
+              className="file-input file-input-bordered w-full"
+            />
+            {importError && (
+              <p className="text-error mt-2 text-sm">{importError}</p>
+            )}
+            {selectedFile && (
+              <p className="text-success mt-2 text-sm">Selected file: {selectedFile.name}</p>
+            )}
+          </div>
+
           <div className="modal-action">
             <label htmlFor="import_modal" className="btn">Cancel</label>
-            <label htmlFor="import_modal" className="btn btn-primary" onClick={handleImportStudents}>Import</label>
+            <label 
+              htmlFor="import_modal" 
+              className="btn btn-primary" 
+              onClick={handleImportStudents}
+            >
+              Import
+            </label>
           </div>
         </div>
         <label className="modal-backdrop" htmlFor="import_modal">Cancel</label>
