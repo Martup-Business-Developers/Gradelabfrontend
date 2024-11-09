@@ -1,6 +1,6 @@
 "use client";
-import { useContext } from "react";
-import { FiUser, FiEdit, FiTrash, FiPlusCircle, FiUsers, FiBook, FiHash, FiPrinter, FiMail } from "react-icons/fi";
+import { useContext, useState } from "react";
+import { FiUser, FiEdit, FiTrash, FiPlusCircle, FiUsers, FiBook, FiHash, FiPrinter, FiMail, FiUpload } from "react-icons/fi";
 import { MainContext } from "@/context/context";
 import { appName } from "@/utils/utils";
 
@@ -27,6 +27,44 @@ export default function Classes() {
     setEditStudentEmail,
     editStudent
   } = useContext(MainContext);
+
+  // New state for import modal
+  const [importData, setImportData] = useState("");
+  
+  // Function to handle importing students
+  const handleImportStudents = () => {
+    try {
+      // Split the pasted data by newlines
+      const lines = importData.trim().split('\n');
+      
+      // Process each line
+      lines.forEach(line => {
+        // Split line by tabs or commas
+        const [rollNo, name, email] = line.split(/[,\t]/).map(item => item.trim());
+        
+        // Validate data
+        if (rollNo && name && email) {
+          // Set the student details
+          setNewStudentRollNo(parseInt(rollNo));
+          setNewStudentName(name);
+          setNewStudentEmail(email);
+          
+          // Add the student
+          addStudent();
+        }
+      });
+      
+      // Clear the import data
+      setImportData("");
+      
+      // Show success message
+      alert("Students imported successfully!");
+      
+    } catch (error) {
+      console.error("Error importing students:", error);
+      alert("Error importing students. Please check the format and try again.");
+    }
+  };
 
   return (
     classes.length === 0 ? <div className="animate-fade-in-bottom flex flex-col w-full max-sm:max-w-none">
@@ -57,15 +95,15 @@ export default function Classes() {
       <div className="flex items-center justify-between mb-1 mt-4 w-full max-w-lg">
         <p className="flex items-center font-semibold text-xl"><FiBook className="mr-2" /> {classes[selectedClass]?.subject} <FiUsers className="ml-5 mr-2" /> {classes[selectedClass]?.name} {classes[selectedClass]?.section}</p>
       </div>
-      <div className="print flex mt-5">
+      <div className="print flex mt-5 gap-2">
         <label htmlFor="newstudent_modal" className="btn btn-primary" onClick={() => setNewStudentRollNo(students.length + 1)}>+ New Student</label>
+        <label htmlFor="import_modal" className="btn btn-secondary"><FiUpload className="mr-2" /> Import Students</label>
       </div>
       <div className="overflow-y-auto h-[70vh] mt-5">
         <div className='print flex w-full items-center max-w-7xl py-5'>
           <button className='btn btn-primary' onClick={() => window.print()}><FiPrinter />Download / Print</button>
         </div>
         <table className="table">
-          {/* head */}
           <thead>
             <tr>
               <th>RollNo</th>
@@ -94,6 +132,27 @@ export default function Classes() {
           </tbody>
         </table>
       </div>
+
+      {/* Import Students Modal */}
+      <input type="checkbox" id="import_modal" className="modal-toggle" />
+      <div className="modal" role="dialog">
+        <div className="modal-box">
+          <h3 className="flex items-center font-bold text-lg"><FiUpload className="mr-1" /> Import Students</h3>
+          <p className="py-4">Paste student data below (Format: Roll No, Name, Email - one student per line)</p>
+          <textarea 
+            className="textarea textarea-bordered w-full h-48"
+            placeholder="1, John Doe, john@example.com&#13;2, Jane Smith, jane@example.com"
+            value={importData}
+            onChange={(e) => setImportData(e.target.value)}
+          />
+          <div className="modal-action">
+            <label htmlFor="import_modal" className="btn">Cancel</label>
+            <label htmlFor="import_modal" className="btn btn-primary" onClick={handleImportStudents}>Import</label>
+          </div>
+        </div>
+        <label className="modal-backdrop" htmlFor="import_modal">Cancel</label>
+      </div>
+
       {/* New Student Modal */}
       <input type="checkbox" id="newstudent_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
@@ -112,6 +171,7 @@ export default function Classes() {
         </div>
         <label className="modal-backdrop" htmlFor="newstudent_modal">Cancel</label>
       </div>
+
       {/* Delete Student Modal */}
       <input type="checkbox" id="deletestudent_modal" className="modal-toggle" />
       <div className="modal">
@@ -125,6 +185,7 @@ export default function Classes() {
         </div>
         <label className="modal-backdrop" htmlFor="deletestudent_modal">Cancel</label>
       </div>
+
       {/* Edit Student Modal */}
       <input type="checkbox" id="editstudent_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
