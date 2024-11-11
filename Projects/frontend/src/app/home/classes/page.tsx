@@ -1,6 +1,6 @@
 "use client";
-import { useContext, useState, useRef } from "react";
-import { FiUser, FiEdit, FiTrash, FiPlusCircle, FiUsers, FiBook, FiHash, FiPrinter, FiMail, FiUpload, FiDownload } from "react-icons/fi";
+import { useContext } from "react";
+import { FiUser, FiEdit, FiTrash, FiPlusCircle, FiUsers, FiBook, FiHash, FiPrinter } from "react-icons/fi";
 import { MainContext } from "@/context/context";
 import { appName } from "@/utils/utils";
 
@@ -14,8 +14,6 @@ export default function Classes() {
     setNewStudentName,
     newStudentRollNo,
     setNewStudentRollNo,
-    newStudentEmail,
-    setNewStudentEmail,
     setDeleteStudentRollNo,
     addStudent,
     deleteStudent,
@@ -23,96 +21,8 @@ export default function Classes() {
     setEditStudentRollNo,
     editStudentName,
     setEditStudentName,
-    editStudentEmail,
-    setEditStudentEmail,
     editStudent
   } = useContext(MainContext);
-
-  const fileInputRef = useRef(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [importError, setImportError] = useState("");
-  
-  // Function to download sample CSV
-  const downloadSampleCSV = () => {
-    const sampleData = `Roll No,Name,Email
-1,John Doe,john@example.com
-2,Jane Smith,jane@example.com
-3,Bob Wilson,bob@example.com`;
-    
-    const blob = new Blob([sampleData], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'sample_students.csv');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  // Function to handle file selection
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type === 'text/csv') {
-      setSelectedFile(file);
-      setImportError("");
-    } else {
-      setImportError("Please select a valid CSV file");
-      setSelectedFile(null);
-    }
-  };
-
-  // Function to handle importing students from CSV
-  const handleImportStudents = () => {
-    if (!selectedFile) {
-      setImportError("Please select a CSV file first");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target.result;
-        const lines = text.split('\n');
-        
-        // Skip header row
-        for (let i = 1; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (line) {
-            const [rollNo, name, email] = line.split(',').map(item => item.trim());
-            
-            if (rollNo && name && email) {
-              setNewStudentRollNo(parseInt(rollNo));
-              setNewStudentName(name);
-              setNewStudentEmail(email);
-              const success = addStudent();
-
-              if (!success) {
-                throw new Error(`Failed to add student with Roll No: ${rollNo}`);
-              }
-            }
-          }
-        }
-        
-        // Reset file input and state
-        setSelectedFile(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-        alert("Students imported successfully!");
-        
-      } catch (error) {
-        console.error("Error importing students:", error);
-        setImportError("Error processing CSV file. Please check the format and try again.");
-      }
-    };
-
-    reader.onerror = () => {
-      setImportError("Error reading the file. Please try again.");
-    };
-
-    reader.readAsText(selectedFile);
-  };
 
   return (
     classes.length === 0 ? <div className="animate-fade-in-bottom flex flex-col w-full max-sm:max-w-none">
@@ -143,35 +53,32 @@ export default function Classes() {
       <div className="flex items-center justify-between mb-1 mt-4 w-full max-w-lg">
         <p className="flex items-center font-semibold text-xl"><FiBook className="mr-2" /> {classes[selectedClass]?.subject} <FiUsers className="ml-5 mr-2" /> {classes[selectedClass]?.name} {classes[selectedClass]?.section}</p>
       </div>
-      <div className="print flex mt-5 gap-2">
+      <div className="print flex mt-5">
         <label htmlFor="newstudent_modal" className="btn btn-primary" onClick={() => setNewStudentRollNo(students.length + 1)}>+ New Student</label>
-        <label htmlFor="import_modal" className="btn btn-secondary"><FiUpload className="mr-2" /> Import Students</label>
       </div>
       <div className="overflow-y-auto h-[70vh] mt-5">
         <div className='print flex w-full items-center max-w-7xl py-5'>
           <button className='btn btn-primary' onClick={() => window.print()}><FiPrinter />Download / Print</button>
         </div>
         <table className="table">
+          {/* head */}
           <thead>
             <tr>
               <th>RollNo</th>
               <th>Name</th>
-              <th>Email</th>
               <th className="print">Edit</th>
               <th className="print">Delete</th>
             </tr>
           </thead>
           <tbody>
             {
-              students.map((student, i) => (
+              students.map((student: any, i: any) => (
                 <tr key={i}>
                   <th>{student?.rollNo}</th>
                   <td>{student?.name}</td>
-                  <td>{student?.email}</td>
                   <td className="print"><label htmlFor="editstudent_modal" className="btn btn-square" onClick={() => {
                     setEditStudentRollNo(student.rollNo);
                     setEditStudentName(student.name);
-                    setEditStudentEmail(student.email);
                   }}><FiEdit /></label></td>
                   <td className="print"><label htmlFor="deletestudent_modal" className="btn btn-square" onClick={() => setDeleteStudentRollNo(student.rollNo)}><FiTrash /></label></td>
                 </tr>
@@ -180,33 +87,50 @@ export default function Classes() {
           </tbody>
         </table>
       </div>
-
-      {/* Modals (Import, New, Edit, Delete) */}
-      <input type="checkbox" id="import_modal" className="modal-toggle" />
+      {/* New Student Modal */}
+      <input type="checkbox" id="newstudent_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box">
-          <h3 className="flex items-center font-bold text-lg"><FiUpload className="mr-1" /> Import Students</h3>
-          <div className="mt-4 mb-6">
-            <button className="btn btn-outline btn-sm" onClick={downloadSampleCSV}>
-              <FiDownload className="mr-2" /> Download Sample CSV
-            </button>
-          </div>
-          <div className="py-4">
-            <p className="text-sm opacity-80 mb-2">Upload a CSV file with columns for Roll No, Name, and Email.</p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="file-input w-full max-w-xs"
-              accept=".csv"
-              onChange={handleFileSelect}
-            />
-            {importError && <p className="text-error mt-2">{importError}</p>}
-          </div>
+          <h3 className="flex items-center font-bold text-lg"><FiPlusCircle className="mr-1" /> New Student</h3>
+          <p className="flex items-center py-4"><FiHash className='mr-2' />Roll No</p>
+          <input className="input input-bordered w-full" placeholder="Roll No" type="number" onChange={(x) => setNewStudentRollNo(parseInt(x.target.value))} value={newStudentRollNo} />
+          <p className="flex items-center py-4"><FiUser className='mr-2' />Student Name</p>
+          <input className="input input-bordered w-full" placeholder="Student Name" type="text" onChange={(x) => setNewStudentName(x.target.value)} value={newStudentName} />
           <div className="modal-action">
-            <label htmlFor="import_modal" className="btn btn-primary" onClick={handleImportStudents}>Import</label>
-            <label htmlFor="import_modal" className="btn">Close</label>
+            <label htmlFor="newstudent_modal" className="btn">Cancel</label>
+            <label htmlFor="newstudent_modal" className="btn btn-primary" onClick={() => addStudent()}>Add Student</label>
           </div>
         </div>
+        <label className="modal-backdrop" htmlFor="newstudent_modal">Cancel</label>
+      </div>
+      {/* Delete Student Modal */}
+      <input type="checkbox" id="deletestudent_modal" className="modal-toggle" />
+      <div className="modal">
+        <div className="modal-box">
+          <h3 className="flex items-center font-bold text-lg"><FiTrash className="mr-1" /> Delete Student</h3>
+          <p className="py-4">Are you sure want to delete this student?</p>
+          <div className="modal-action">
+            <label htmlFor="deletestudent_modal" className="btn">Cancel</label>
+            <label htmlFor="deletestudent_modal" className="btn btn-error" onClick={() => deleteStudent()}>Delete</label>
+          </div>
+        </div>
+        <label className="modal-backdrop" htmlFor="deletestudent_modal">Cancel</label>
+      </div>
+      {/* Edit Student Modal */}
+      <input type="checkbox" id="editstudent_modal" className="modal-toggle" />
+      <div className="modal" role="dialog">
+        <div className="modal-box">
+          <h3 className="flex items-center font-bold text-lg"><FiEdit className="mr-1" /> Edit Student</h3>
+          <p className="flex items-center py-4"><FiHash className='mr-2' />Roll No</p>
+          <p className="flex items-center py-4">{editStudentRollNo}</p>
+          <p className="flex items-center py-4"><FiUser className='mr-2' />Student Name</p>
+          <input className="input input-bordered w-full" placeholder="Student Name" type="text" onChange={(x) => setEditStudentName(x.target.value)} value={editStudentName} />
+          <div className="modal-action">
+            <label htmlFor="editstudent_modal" className="btn">Cancel</label>
+            <label htmlFor="editstudent_modal" className="btn btn-primary" onClick={() => editStudent()}>Save</label>
+          </div>
+        </div>
+        <label className="modal-backdrop" htmlFor="editstudent_modal">Cancel</label>
       </div>
     </div>
   );
