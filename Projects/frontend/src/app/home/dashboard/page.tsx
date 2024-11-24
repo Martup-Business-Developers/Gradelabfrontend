@@ -1,7 +1,59 @@
 "use client";
 import { useContext, useEffect } from 'react';
 import { MainContext } from '@/context/context';
-import { FiUsers, FiFileText, FiBook, FiTrendingUp } from 'react-icons/fi';
+import { 
+  FiUsers, 
+  FiFileText, 
+  FiBook, 
+  FiTrendingUp, 
+  FiClock, 
+  FiCalendar,
+  FiActivity 
+} from 'react-icons/fi';
+
+const MetricCard = ({ title, value, icon: Icon, color }: any) => (
+  <div className="card p-6">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-500">{title}</p>
+        <p className="text-2xl font-semibold mt-1">{value}</p>
+      </div>
+      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${color}`}>
+        <Icon className="w-6 h-6 text-white" />
+      </div>
+    </div>
+  </div>
+);
+
+const ActivityItem = ({ title, subtitle, time, icon: Icon = FiActivity }: any) => (
+  <div className="p-4 hover:bg-gray-50 transition-colors">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-blue-600" />
+        </div>
+        <div>
+          <p className="font-medium">{title}</p>
+          <p className="text-sm text-gray-500">{subtitle}</p>
+        </div>
+      </div>
+      <span className="text-sm text-gray-500">{time}</span>
+    </div>
+  </div>
+);
+
+const RecentActivity = ({ title, items, icon }: any) => (
+  <div className="card">
+    <div className="border-b p-4">
+      <h2 className="text-lg font-semibold">{title}</h2>
+    </div>
+    <div className="divide-y">
+      {items.map((item: any, i: number) => (
+        <ActivityItem key={i} {...item} icon={icon} />
+      ))}
+    </div>
+  </div>
+);
 
 export default function DashboardPage() {
   const { evaluators, classes, getEvaluators, getClasses } = useContext(MainContext);
@@ -50,76 +102,29 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((metric, i) => (
-          <div key={i} className="card p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">{metric.title}</p>
-                <p className="text-2xl font-semibold mt-1">{metric.value}</p>
-              </div>
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${metric.color}`}>
-                <metric.icon className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
+          <MetricCard key={i} {...metric} />
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
-          <div className="border-b p-4">
-            <h2 className="text-lg font-semibold">Recent Evaluators</h2>
-          </div>
-          <div className="divide-y">
-            {evaluators?.slice(0, 5).map((evaluator: any, i: number) => (
-              <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                      <FiClock className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{evaluator.title}</p>
-                      <p className="text-sm text-gray-500">
-                        {classes?.find(c => c._id === evaluator.classId)?.subject || 'No class assigned'}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-500">
-                    {new Date(evaluator.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="border-b p-4">
-            <h2 className="text-lg font-semibold">Classes Overview</h2>
-          </div>
-          <div className="divide-y">
-            {classes?.slice(0, 5).map((_class: any, i: number) => (
-              <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                      <FiClock className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{_class.subject}</p>
-                      <p className="text-sm text-gray-500">
-                        {_class.name} {_class.section}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-500">
-                    {evaluators?.filter(e => e.classId === _class._id).length || 0} evaluators
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <RecentActivity 
+          title="Recent Evaluators"
+          icon={FiFileText}
+          items={evaluators?.slice(0, 5).map((e: any) => ({
+            title: e.title,
+            subtitle: classes?.find((c: any) => c._id === e.classId)?.subject || 'No class assigned',
+            time: new Date(e.createdAt).toLocaleDateString()
+          })) || []}
+        />
+        <RecentActivity 
+          title="Recent Classes"
+          icon={FiUsers}
+          items={classes?.slice(0, 5).map((c: any) => ({
+            title: c.subject,
+            subtitle: `${c.name} ${c.section}`,
+            time: `${evaluators?.filter(e => e.classId === c._id).length || 0} evaluators`
+          })) || []}
+        />
       </div>
     </div>
   );
