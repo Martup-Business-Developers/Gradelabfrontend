@@ -1,16 +1,17 @@
+"use client";
 import { useContext, useEffect, useRef, useState } from "react";
 import { FiPlus, FiMoreHorizontal, FiSettings, FiUser, FiLogOut, FiFileText, FiEdit, FiTrash, FiArrowRight, FiShoppingCart, FiShoppingBag, FiType, FiPlusCircle, FiKey, FiUsers, FiBook, FiInfo } from "react-icons/fi";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
 import { appName } from "@/utils/utils";
 import { UploadButton } from "@/utils/uploadthing";
 import { MainContext } from "@/context/context";
+import { usePathname } from "next/navigation";
 
 export default function Home({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const location = useLocation();
   const {
     moreMenuOpen,
     setMoreMenuOpen,
@@ -60,20 +61,21 @@ export default function Home({
     setEditEvaluatorClassId,
     editEvaluator } = useContext(MainContext);
 
+  const pathname = usePathname();
   const newClassModalRef = useRef<any | null>(null);
 
   useEffect(() => {
     getEvaluators();
     getClasses();
 
-    location.pathname === "/home/classes" ? setSelectedTab(1) : setSelectedTab(0);
+    pathname === "/home/classes" ? setSelectedTab(1) : setSelectedTab(0);
 
     if (typeof window !== 'undefined') {
       if (!localStorage.getItem("token")) {
         window.location.href = "/login";
       }
     }
-  }, [location.pathname]);
+  }, []);
 
   useEffect(() => {
     if (selectedClass !== -1) {
@@ -93,233 +95,118 @@ export default function Home({
   }, [selectedEvaluator]);
 
   return (
-    <main className="flex bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen w-screen p-4 max-sm:p-2" onClick={() => {
+    <main className="flex bg-base-100 h-screen w-screen p-2 max-sm:p-0" onClick={() => {
       if (moreMenuOpen) setMoreMenuOpen(false);
     }}>
-      {/* Sidebar */}
-      <div className={`print flex flex-col p-6 min-w-[300px] max-w-[20vw] h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-all duration-300 ${!showMenu ? "max-sm:hidden" : "max-sm:fixed max-sm:w-full max-sm:h-full max-sm:max-w-none max-sm:z-50"}`}>
-        <div className="flex justify-between items-center mb-6">
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <img src="/logo.png" alt={appName} className="w-10 h-10" />
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {appName}
-            </span>
-          </Link>
-          <button 
-            className="hidden max-sm:flex p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            onClick={() => setShowMenu(false)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex p-1 bg-gray-100 dark:bg-gray-700 rounded-lg mb-4">
-          <Link 
-            to="/home/evaluators"
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md text-center transition-colors ${selectedTab === 0 ? "bg-white dark:bg-gray-800 shadow-sm" : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600"}`}
-            onClick={() => { setSelectedTab(0); setSelectedClass(-1); setSelectedEvaluator(0) }}
-          >
-            Evaluators
-          </Link>
-          <Link 
-            to="/home/classes"
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md text-center transition-colors ${selectedTab === 1 ? "bg-white dark:bg-gray-800 shadow-sm" : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600"}`}
-            onClick={() => { setSelectedTab(1); setSelectedEvaluator(-1); setSelectedClass(0) }}
-          >
-            Classes
-          </Link>
-        </div>
-
-        {/* New Button */}
-        <label 
-          ref={newClassModalRef}
-          className="btn bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 rounded-lg py-3 px-4 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition-all duration-300"
-          htmlFor={selectedTab === 0 && limits?.evaluatorLimit === 0 ? "limitexceed_modal" : ["newevaluator_modal", "newclass_modal"][selectedTab]}
-        >
-          <FiPlus className="w-5 h-5" />
-          <span>NEW {["EVALUATOR", "CLASS"][selectedTab]}</span>
-        </label>
-
-        {/* List Section */}
-        <div className="flex-1 mt-4 overflow-y-auto custom-scrollbar">
-          {selectedTab === 0 ? (
-            <div className="space-y-2">
-              {evaluators?.map((evaluator: any, i: number) => (
-                <div
-                  key={i}
-                  className={`group p-4 rounded-lg transition-all duration-200 cursor-pointer ${
-                    selectedEvaluator === i 
-                      ? "bg-blue-50 dark:bg-gray-700 border-l-4 border-blue-500" 
-                      : "hover:bg-gray-50 dark:hover:bg-gray-700"
-                  }`}
-                  onClick={() => {
-                    setSelectedEvaluator(i);
-                    setShowMenu(false);
-                    if (window.location.pathname !== "/home/evaluators") {
-                      window.location.href = "/home/evaluators";
-                    }
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <FiFileText className="w-5 h-5 text-blue-500" />
-                    <span className="flex-1 font-medium truncate">{evaluator.title}</span>
-                  </div>
-                  
-                  {selectedEvaluator === i && (
-                    <div className="flex mt-3 space-x-2">
-                      <label
-                        htmlFor="editevaluator_modal"
-                        className="flex items-center justify-center flex-1 px-3 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
-                        onClick={() => {
-                          setEditEvaluatorTitle(evaluators[i].title);
-                          setEditEvaluatorClassId(evaluators[i].classId);
-                        }}
-                      >
-                        <FiEdit className="w-4 h-4 mr-2" />
-                        Edit
-                      </label>
-                      <label
-                        htmlFor="deleteevaluator_modal"
-                        className="flex items-center justify-center flex-1 px-3 py-2 text-sm rounded-md bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
-                      >
-                        <FiTrash className="w-4 h-4 mr-2" />
-                        Delete
-                      </label>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {classes?.map((_class: any, i: number) => (
-                <div
-                  key={i}
-                  className={`group p-4 rounded-lg transition-all duration-200 cursor-pointer ${
-                    selectedClass === i 
-                      ? "bg-purple-50 dark:bg-gray-700 border-l-4 border-purple-500" 
-                      : "hover:bg-gray-50 dark:hover:bg-gray-700"
-                  }`}
-                  onClick={() => { setSelectedClass(i); setShowMenu(false) }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <FiUsers className="w-5 h-5 text-purple-500" />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{_class.subject}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{_class.name} {_class.section}</p>
-                    </div>
-                  </div>
-                  
-                  {selectedClass === i && (
-                    <div className="flex mt-3 space-x-2">
-                      <label
-                        htmlFor="editclass_modal"
-                        className="flex items-center justify-center flex-1 px-3 py-2 text-sm rounded-md bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
-                        onClick={() => {
-                          setEditClassName(classes[i].name);
-                          setEditClassSection(classes[i].section);
-                          setEditClassSubject(classes[i].subject);
-                        }}
-                      >
-                        <FiEdit className="w-4 h-4 mr-2" />
-                        Edit
-                      </label>
-                      <label
-                        htmlFor="deleteclass_modal"
-                        className="flex items-center justify-center flex-1 px-3 py-2 text-sm rounded-md bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
-                      >
-                        <FiTrash className="w-4 h-4 mr-2" />
-                        Delete
-                      </label>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Footer Section */}
-        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <FiSettings className="w-4 h-4 mr-2" />
-              <span>{limits?.evaluatorLimit} evaluators left</span>
-            </div>
-            <Link 
-              to="/shop"
-              className="px-3 py-1 text-sm bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full hover:from-green-600 hover:to-emerald-700 transition-colors"
-            >
-              <FiShoppingCart className="inline-block w-4 h-4 mr-1" />
-              Shop
-            </Link>
-          </div>
-
-          {user?.type === 0 && (
-            <Link to="/admin/dashboard">
-              <button className="w-full mb-4 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-between">
-                <span className="flex items-center">
-                  <FiUser className="w-4 h-4 mr-2" />
-                  Admin Panel
-                </span>
-                <FiArrowRight className="w-4 h-4" />
-              </button>
-            </Link>
-          )}
-
-          <div className="relative">
-            <div 
-              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-              onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white">
-                  <FiUser className="w-5 h-5" />
-                </div>
-                <span className="font-medium">{user?.name}</span>
-              </div>
-              <FiMoreHorizontal className="w-5 h-5 text-gray-500" />
-            </div>
-
-            {moreMenuOpen && (
-              <div className="absolute bottom-full left-0 w-full mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <Link to="/shop">
-                  <div className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    <FiShoppingCart className="w-4 h-4" />
-                    <span>Shop</span>
-                  </div>
-                </Link>
-                <Link to="/purchases">
-                  <div className="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    <FiShoppingBag className="w-4 h-4" />
-                    <span>My Purchases</span>
-                  </div>
-                </Link>
-                <div className="border-t border-gray-200 dark:border-gray-700" />
-                <div 
-                  className="flex items-center space-x-2 px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
-                  onClick={() => {
-                    localStorage.clear();
-                    window.location.href = "/";
-                  }}
-                >
-                  <FiLogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </div>
-              </div>
-            )}
+   {/* Sidebar */}
+      <div className={'print flex flex-col p-5 min-w-[275px] max-w-[15vw] h-full rounded-md ' + (!showMenu ? "max-sm:hidden " : "max-sm:fixed max-sm:w-full max-sm:h-full max-sm:max-w-none bg-base-100 max-sm:z-50 ")}>
+        <div className="flex justify-between items-center max-sm:mb-4">
+          <Link href="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png">
+    <div className="mb-5 font-semibold max-sm:mb-3" onClick={() => setSelectedEvaluator(-1)}>
+        🤖 {appName} 📝
+    </div>
+</Link>
+            <div className="hidden max-sm:flex justify-end mb-3">
+            <button className="btn btn-square btn-sm" onClick={() => setShowMenu(false)}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
         </div>
+        <div role="tablist" className="tabs tabs-boxed mb-2">
+          <Link href={"/home/evaluators"} role="tab" className={"tab " + (selectedTab === 0 ? "tab-active" : "")} onClick={() => { setSelectedTab(0); setSelectedClass(-1); setSelectedEvaluator(0) }}>Evaluators</Link>
+          <Link href={"/home/classes"} role="tab" className={"tab " + (selectedTab === 1 ? "tab-active" : "")} onClick={() => { setSelectedTab(1); setSelectedEvaluator(-1); setSelectedClass(0) }}>Classes</Link>
+        </div>
+        <label ref={(x) => {
+          newClassModalRef.current = x;
+        }} htmlFor="newclass_modal" hidden></label>
+        <label className='btn btn-primary' htmlFor={selectedTab === 0 && limits?.evaluatorLimit === 0 ? "limitexceed_modal" : ["newevaluator_modal", "newclass_modal"][selectedTab]}><FiPlus /> NEW {["EVALUATOR", "CLASS"][selectedTab]}</label>
+        <div className='p-0 my-2 h-full w-full overflow-hidden hover:overflow-y-auto'>
+          {selectedTab === 0 ?
+            evaluators?.map((evaluator: any, i: number) => {
+              return <div key={i} className={(selectedEvaluator === i ? ' bg-base-200 ' : ' bg-transparent hover:bg-base-200 ') + 'cursor-pointer flex flex-col px-3 py-2 rounded-md w-full mb-1'} onClick={() => {
+                setSelectedEvaluator(i); setShowMenu(false); if (window.location.pathname !== "/home/evaluators") window.location.href = "/home/evaluators";
+              }}>
+                <div className='flex justify-start items-center'>
+                  <div className='w-fit mr-2'>
+                    <FiFileText />
+                  </div>
+                  <div className='flex flex-col items-start'>
+                    <p className='text-sm text-ellipsis line-clamp-1 font-semibold'>{evaluator.title}</p>
+                  </div>
+                </div>
+                {selectedEvaluator === i ?
+                  <div className='flex mt-2'>
+                    <label htmlFor='editevaluator_modal' className='cursor-pointer flex justify-center items-center w-full p-2 bg-base-300 rounded-md mr-1 hover:bg-gray-500 hover:text-white' onClick={() => {
+                      setEditEvaluatorTitle(evaluators[i].title);
+                      setEditEvaluatorClassId(evaluators[i].classId);
+                    }}>
+                      <FiEdit /><p className='ml-2 text-xs'>Edit</p>
+                    </label>
+                    <label htmlFor='deleteevaluator_modal' className='cursor-pointer flex justify-center items-center w-full p-2 bg-base-300 rounded-md hover:bg-red-500 hover:text-white'>
+                      <FiTrash /><p className='ml-2 text-xs'>Delete</p>
+                    </label>
+                  </div> : ""}
+              </div>
+            }) :
+            classes?.map((_class: any, i: number) => {
+              return <div key={i} className={(selectedClass === i ? ' bg-base-200 ' : ' bg-transparent hover:bg-base-200 ') + 'cursor-pointer flex flex-col px-3 py-2 rounded-md w-full mb-1'} onClick={() => { setSelectedClass(i); setShowMenu(false) }}>
+                <div className='flex justify-start items-center'>
+                  <div className='w-fit mr-2'>
+                    <FiUsers />
+                  </div>
+                  <div className='flex flex-col items-start'>
+                    <p className='text-sm text-ellipsis line-clamp-1 font-semibold'>{_class.subject}</p>
+                    <p className='text-xs text-ellipsis line-clamp-1'>{_class.name} {_class.section}</p>
+                  </div>
+                </div>
+                {selectedClass === i ?
+                  <div className='flex mt-2'>
+                    <label htmlFor='editclass_modal' className='cursor-pointer flex justify-center items-center w-full p-2 bg-base-300 rounded-md mr-1 hover:bg-gray-500 hover:text-white' onClick={() => {
+                      setEditClassName(classes[i].name);
+                      setEditClassSection(classes[i].section);
+                      setEditClassSubject(classes[i].subject);
+                    }}>
+                      <FiEdit /><p className='ml-2 text-xs'>Edit</p>
+                    </label>
+                    <label htmlFor='deleteclass_modal' className='cursor-pointer flex justify-center items-center w-full p-2 bg-base-300 rounded-md hover:bg-red-500 hover:text-white'>
+                      <FiTrash /><p className='ml-2 text-xs'>Delete</p>
+                    </label>
+                  </div> : ""}
+              </div>
+            })
+          }
+        </div>
+        <hr />
+        <div className="flex justify-between my-4">
+          <p className="flex items-center text-sm mb-2"><FiSettings className="mr-1" /> {limits?.evaluatorLimit} evaluators left</p>
+          <Link href="/shop"><button className="btn btn-xs"><FiShoppingCart /> SHOP</button></Link>
+        </div>
+        {user?.type === 0 ? <Link href="/admin/dashboard"><label className='btn mb-2 w-full'><FiUser /> ADMIN PANEL <FiArrowRight /></label></Link> : ""}
+        <div tabIndex={0} className='cursor-pointer dropdown dropdown-top flex items-center hover:bg-base-200 p-2 rounded-lg'>
+          <div className='flex items-center justify-between w-full'>
+            <div className='flex items-center'>
+              <div className="avatar placeholder mr-2">
+                <div className="bg-blue-700 text-white mask mask-squircle w-10">
+                  <span><FiUser /></span>
+                </div>
+              </div>
+              <p className='font-semibold'>{user?.name}</p>
+            </div>
+            <FiMoreHorizontal />
+          </div>
+          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mb-2">
+            <Link href="/shop"><label><li className='flex'><p><FiShoppingCart />Shop</p></li></label></Link>
+            <Link href="/purchases"><label><li className='flex'><p><FiShoppingBag />My Purchases</p></li></label></Link>
+            <hr className='my-2' />
+            <li className='flex' onClick={() => {
+              localStorage.clear()
+              window.location.href = "/";
+            }}><p><FiLogOut className="text-red-600" />Logout</p></li>
+          </ul>
+        </div>
       </div>
-
-      {/* Main Content */}
-      <div className="flex-1 ml-6 max-sm:ml-0">
-        {children}
-      </div>
-
+      {/* Main */}
+      {children}
       {/* New Evaluator Modal */}
       <input type="checkbox" id="newevaluator_modal" className="modal-toggle" />
       <div className="modal" role="dialog">
