@@ -64,8 +64,6 @@ export default function Home({
   const pathname = usePathname();
   const newClassModalRef = useRef<any | null>(null);
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   useEffect(() => {
     getEvaluators();
     getClasses();
@@ -97,31 +95,11 @@ export default function Home({
   }, [selectedEvaluator]);
 
   return (
-    <main className="flex flex-col bg-base-100 h-screen w-screen p-2 max-sm:p-0" onClick={() => {
+    <main className="flex bg-base-100 h-screen w-screen p-2 max-sm:p-0" onClick={() => {
       if (moreMenuOpen) setMoreMenuOpen(false);
     }}>
-      {/* Mobile Navigation Button - Only visible on mobile */}
-      <div className="hidden max-sm:flex justify-between items-center mb-4">
-        <button className="btn btn-square btn-sm" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Get Started Button */}
-      <div className="flex justify-center my-4">
-        <button className="btn btn-primary" onClick={() => {
-          setNewEvaluatorTitle("");
-          setNewEvaluatorClassId("-1");
-          newClassModalRef.current.click();
-        }}>
-          Get Started
-        </button>
-      </div>
-
-      {/* Sidebar - Desktop version */}
-      <div className="print flex flex-col p-5 min-w-[275px] max-w-[15vw] h-full rounded-md max-sm:hidden">
+   {/* Sidebar */}
+      <div className={'print flex flex-col p-5 min-w-[275px] max-w-[15vw] h-full rounded-md ' + (!showMenu ? "max-sm:hidden " : "max-sm:fixed max-sm:w-full max-sm:h-full max-sm:max-w-none bg-base-100 max-sm:z-50 ")}>
         <div className="flex justify-between items-center max-sm:mb-4">
           <Link href="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png">
     <div className="mb-5 font-semibold max-sm:mb-3" onClick={() => setSelectedEvaluator(-1)}>
@@ -227,33 +205,6 @@ export default function Home({
           </ul>
         </div>
       </div>
-
-      {/* Mobile Menu - Only visible on mobile when toggled */}
-      {isMobileMenuOpen && (
-        <div className="hidden max-sm:flex fixed inset-0 bg-base-100 z-50 flex-col p-5">
-          <div className="flex justify-between items-center mb-4">
-            <Link href="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png">
-              <div className="font-semibold" onClick={() => setSelectedEvaluator(-1)}>
-                🤖 {appName} 📝
-              </div>
-            </Link>
-            <button className="btn btn-square btn-sm" onClick={() => setIsMobileMenuOpen(false)}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          {/* Copy of sidebar content for mobile */}
-          <div role="tablist" className="tabs tabs-boxed mb-2">
-            <Link href={"/home/evaluators"} role="tab" className={"tab " + (selectedTab === 0 ? "tab-active" : "")} onClick={() => { setSelectedTab(0); setSelectedClass(-1); setSelectedEvaluator(0); setIsMobileMenuOpen(false); }}>Evaluators</Link>
-            <Link href={"/home/classes"} role="tab" className={"tab " + (selectedTab === 1 ? "tab-active" : "")} onClick={() => { setSelectedTab(1); setSelectedEvaluator(-1); setSelectedClass(0); setIsMobileMenuOpen(false); }}>Classes</Link>
-          </div>
-          <label className='btn btn-primary mb-2' htmlFor={selectedTab === 0 && limits?.evaluatorLimit === 0 ? "limitexceed_modal" : ["newevaluator_modal", "newclass_modal"][selectedTab]} onClick={() => setIsMobileMenuOpen(false)}><FiPlus /> NEW {["EVALUATOR", "CLASS"][selectedTab]}</label>
-          {/* Rest of the sidebar content */}
-          {/* ... Copy the rest of your sidebar content here ... */}
-        </div>
-      )}
-
       {/* Main */}
       {children}
       {/* New Evaluator Modal */}
