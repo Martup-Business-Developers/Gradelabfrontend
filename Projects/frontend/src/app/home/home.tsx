@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { FiPlus, FiMoreHorizontal, FiSettings, FiUser, FiLogOut, FiFileText, FiEdit, FiTrash, FiArrowRight, FiShoppingCart, FiShoppingBag, FiType, FiPlusCircle, FiKey, FiUsers, FiBook, FiInfo } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { appName } from "@/utils/utils";
 import { UploadButton } from "@/utils/uploadthing";
 import { MainContext } from "@/context/context";
@@ -10,6 +10,7 @@ export default function Home({
 }: {
   children: React.ReactNode
 }) {
+  const location = useLocation();
   const {
     moreMenuOpen,
     setMoreMenuOpen,
@@ -65,14 +66,14 @@ export default function Home({
     getEvaluators();
     getClasses();
 
-    window.location.pathname === "/home/classes" ? setSelectedTab(1) : setSelectedTab(0);
+    location.pathname === "/home/classes" ? setSelectedTab(1) : setSelectedTab(0);
 
     if (typeof window !== 'undefined') {
       if (!localStorage.getItem("token")) {
         window.location.href = "/login";
       }
     }
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (selectedClass !== -1) {
