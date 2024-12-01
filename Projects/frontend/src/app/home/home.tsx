@@ -95,10 +95,16 @@ export default function Home({
   }, [selectedEvaluator]);
 
   return (
-    <main className="flex bg-base-100 h-screen w-screen p-2 max-sm:p-0" onClick={() => {
+    <main className="flex flex-col bg-base-100 h-screen w-screen p-2 max-sm:p-0" onClick={() => {
       if (moreMenuOpen) setMoreMenuOpen(false);
     }}>
-   {/* Sidebar */}
+      {/* Get Started Button */}
+      <div className="flex justify-center my-4">
+        <button className="btn btn-primary" onClick={() => newClassModalRef.current.click()}>
+          Get Started
+        </button>
+      </div>
+      {/* Sidebar */}
       <div className={'print flex flex-col p-5 min-w-[275px] max-w-[15vw] h-full rounded-md ' + (!showMenu ? "max-sm:hidden " : "max-sm:fixed max-sm:w-full max-sm:h-full max-sm:max-w-none bg-base-100 max-sm:z-50 ")}>
         <div className="flex justify-between items-center max-sm:mb-4">
           <Link href="https://gradelab.io/wp-content/uploads/2024/10/GradeLab-black.png">
