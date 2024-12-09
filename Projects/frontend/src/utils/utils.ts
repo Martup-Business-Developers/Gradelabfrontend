@@ -1,5 +1,5 @@
-const serverURL = "https://api.gradelab.io"
-const hostname = "https://api.gradelab.io";
+const serverURL = "https://app.gradelab.io"
+const hostname = "https://app.gradelab.io";
 const currencySymbol = "$";
 const appName = "GradeLab";
 //UploadThing
