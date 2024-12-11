@@ -24,8 +24,8 @@ const router = express.Router();
 const stripeObj = stripe(process.env.STRIPE_SECRET_KEY);
 
 //PAYPAL BASE URL
-const base = "https://api-m.sandbox.paypal.com"; //sandbox
-//const base = "https://api-m.paypal.com"; //live
+// const base = "https://api-m.sandbox.paypal.com"; //sandbox
+const base = "https://api-m.paypal.com"; 
 
 router.get("/", async (req, res) => {
     const paymentMethod = await PaymentMethod.findOne();
